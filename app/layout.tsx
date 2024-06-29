@@ -1,6 +1,6 @@
 import { ClerkProvider, RedirectToSignIn, SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import './globals.css';
-import SignInPage from './(auth)/(routes)/sign-in/[[...sign-in]]/page';
+import { ModalProvider } from '@/providers/modal-provider';
 
 export default function RootLayout({
   children,
@@ -11,8 +11,9 @@ export default function RootLayout({
     <ClerkProvider>
           <html>
       <body>
+      <ModalProvider/>
       {children}
-</body>
+      </body>
     </html>
   </ClerkProvider>
   )
