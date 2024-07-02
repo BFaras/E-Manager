@@ -12,7 +12,6 @@ import * as z from 'zod'
 import axios from 'axios'
 import {toast} from "react-hot-toast"
 
-
 const formSchema = z.object({
     name: z.string().min(1),
 })
@@ -34,7 +33,7 @@ export function StoreModal() {
 
             const response = await axios.post('/api/stores',values)
 
-            toast.success("Store created successfully")
+            window.location.assign(`/${response.data.id}`);
         } catch (error) {
             toast.error("something wwent wrontg")
         } finally {
