@@ -1,9 +1,11 @@
+import { AnyARecord } from "dns"
+import { Key } from "react"
 
 
 export interface Store {
-  id:String 
-  name: String
-  userId: String
+  id: string
+  name: string
+  userId: string
   createdAt : Date 
   updatedAt : Date
 }
