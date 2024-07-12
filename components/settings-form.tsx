@@ -14,6 +14,7 @@ import { Input } from './ui/input';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { AlertModal } from '@/app/modals/alert-modal';
 
 interface SettingFormProps {
     initialData:Store
@@ -48,8 +49,30 @@ export default function SettingForm({initialData}:SettingFormProps) {
         } catch (error) {
             toast.error("Something went wrong")        }
     }
+
+    const onDelette = async () => {
+        try {
+            setLoading(true)
+            await axios.delete(`/api/stores/${params.storeid}`)
+            router.refresh()
+            router.push("/")
+            toast.success("Store deleted")
+        } catch (error) {
+            toast.error("Make sure you removed all the products first")
+        } finally {
+            setLoading(false);
+            setOpen(false);
+        }
+}
   return (
     <>
+    <AlertModal
+    isOpen={open}
+    onClose={()=>setOpen(false)}
+    onConfirm={onDelette}
+    loading={loading}
+
+    ></AlertModal>
         <div className='flex items-center justify-between'>
                 <Heading title="Settings"
                 description= "Manage store preference"/>
@@ -59,7 +82,7 @@ export default function SettingForm({initialData}:SettingFormProps) {
         </div>
         <Separator></Separator>
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full border border-solid border-gray-600">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full ">
                 <div className='grid grid-cols-3 gap-8'>
                     <FormField 
                     control={form.control}
