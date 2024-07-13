@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/navbar";
 import prismaDB from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
@@ -27,6 +28,7 @@ export default async function DashboardLayout({
     if (!store) {
         redirect('/')
     }
+
 
     return (
         <>

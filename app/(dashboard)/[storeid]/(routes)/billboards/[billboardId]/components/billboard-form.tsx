@@ -88,9 +88,9 @@ export default function BillboardForm({initialData}:BillboardFormProps) {
         <div className='flex items-center justify-between'>
                 <Heading title={title}
                 description= {description}/>
-                <Button variant = "destructive" size= "icon"onClick={()=>setOpen(true)}>
+                { initialData && <Button variant = "destructive" size= "icon"onClick={()=>setOpen(true)}>
                     <Trash className='h-4 w-4'></Trash>
-                </Button>
+                </Button>}
         </div>
         <Separator></Separator>
         <Form {...form}>
