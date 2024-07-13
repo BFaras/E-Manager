@@ -1,5 +1,4 @@
 "use client"
-
 import React, { useState } from 'react'
 import Heading from './heading'
 import * as z from "zod";
@@ -15,6 +14,8 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { AlertModal } from '@/app/modals/alert-modal';
+import { ApiAlert } from './ui/api-alert';
+import { useOrigin } from '@/hooks/use-origin';
 
 interface SettingFormProps {
     initialData:Store
@@ -30,6 +31,7 @@ export default function SettingForm({initialData}:SettingFormProps) {
 
     const params = useParams()
     const router = useRouter()
+    const origin = useOrigin()
 
     const [open,setOpen] = useState(false);
     const [loading,setLoading] = useState(false);
@@ -102,6 +104,11 @@ export default function SettingForm({initialData}:SettingFormProps) {
                 </Button>
             </form>
         </Form>
+        <Separator></Separator>
+        <ApiAlert  
+        title="NEXT_PUBLIC_API_URL" 
+        description = {`${origin}/api/${params.storeid}`}
+        variant="public"></ApiAlert>
    </>
   )
 }
