@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { Store } from '../prisma/prisma-model'
 import { useStoreModal } from '@/hooks/use-store-modal'
 import { useParams,useRouter } from 'next/navigation'
 import { Button } from './ui/button'
 import { Check, ChevronDown, PlusCircle, Store  as StoreIcon} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Command,CommandEmpty,CommandGroup,CommandItem,CommandList,CommandInput, CommandSeparator } from './ui/command'
+import { Store } from '@prisma/client';
 
 
 
@@ -36,7 +36,7 @@ export default function StoreSwitcher({
 
     }));
 
-    const currentStore = formattedItems.find((item)=> item.id === params.storeid)
+    const currentStore = formattedItems.find((item)=> item.id === params.storeId)
 
     const onStoreSelect = (store: {value:string, label: string}) => {
         setOpen(false)

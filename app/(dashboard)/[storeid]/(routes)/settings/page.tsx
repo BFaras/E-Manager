@@ -7,7 +7,7 @@ import React from 'react'
 
 interface SettingPageProps {
     params:{
-        storeid: string
+        storeId: string
     }
 }
 export default async function SettingsPage({ params }: SettingPageProps) {
@@ -20,7 +20,7 @@ export default async function SettingsPage({ params }: SettingPageProps) {
 
     const store = await prismaDB.store.findFirst({
         where: {
-            id: params.storeid,
+            id: params.storeId,
             userId
         }
     })
