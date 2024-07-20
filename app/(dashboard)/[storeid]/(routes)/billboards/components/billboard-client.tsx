@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@radix-ui/react-separator'
 import { useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
-import { Billboard } from '@prisma/client';
 import { BillboardColumn, columns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
+import ApiList from '@/components/ui/api-list';
 
 interface BillboardClientProps {
   data: BillboardColumn[]
@@ -32,7 +32,10 @@ export default function BillboardClient({data}:BillboardClientProps) {
     </div>
     <Separator></Separator>
     <DataTable columns={columns} data={data} searchKey="label"></DataTable>
-      
+    <Heading title="API" description="API calls for Billboards"></Heading>
+    <Separator></Separator>
+    <ApiList entityName='billboards' entityIdName="billboardId"></ApiList>
+
     </>
   )
 }
