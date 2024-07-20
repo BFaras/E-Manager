@@ -15,18 +15,18 @@ export type SizeColumn = {
 export const columns: ColumnDef<SizeColumn>[] = [
   {
     accessorKey: "name",
-    header: "Label",
+    header: "Name",
   },
   {
     accessorKey: "value",
-    header: "Date",
+    header: "Value",
   },
   {
     accessorKey: "createdAt",
     header: "Date",
   },
   {
-    accessorKey:"action",
+    accessorKey:"Action",
     cell:({row}) => <CellAction data ={row.original}/>
    }
 ]

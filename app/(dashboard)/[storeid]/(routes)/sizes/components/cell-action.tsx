@@ -32,7 +32,7 @@ export default function CellAction({data}:CellActionProps) {
             router.refresh()
             toast.success("Size deleted")
         } catch (error) {
-            toast.error("Make sure you removed all categories using size")
+            toast.error("Make sure you removed all products using this size")
         } finally {
             setLoading(false);
             setOpen(false);
