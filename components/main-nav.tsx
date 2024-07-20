@@ -22,7 +22,7 @@ export default function MainNav({
         {
             href:`/${params.storeId}/billboards`,
             label:'Billboard',
-            active: pathname === `/${params.storeId}/billboards}`
+            active: pathname === `/${params.storeId}/billboards`
         }
         ,
         {
