@@ -13,24 +13,22 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { AlertModal } from '@/app/modals/alert-modal';
-import { ApiAlert } from '@/components/ui/api-alert';
-import { useOrigin } from '@/hooks/use-origin';
-import { Billboard } from '@prisma/client';
+import { Size } from '@prisma/client';
 import ImageUpload from '@/components/ui/image-upload';
 
 
 const formSchema = z.object({
-    label: z.string().min(1),
-    imageUrl: z.string().min(1)
+    name: z.string().min(1),
+    value: z.string().min(1)
 })
 
-type BillboardFormValues = z.infer<typeof formSchema>
+type SizeFormValues = z.infer<typeof formSchema>
 
-interface BillboardFormProps {
-    initialData: Billboard | null
+interface SizeFormProps {
+    initialData: Size | null
 }
 
-export default function BillboardForm({initialData}:BillboardFormProps) {
+export default function SizeForm({initialData}:SizeFormProps) {
 
     const params = useParams()
     const router = useRouter()
@@ -38,28 +36,28 @@ export default function BillboardForm({initialData}:BillboardFormProps) {
     const [open,setOpen] = useState(false);
     const [loading,setLoading] = useState(false);
 
-    const title = initialData ? "Edit billboard" : "Create billboard"
-    const description = initialData ? "Edit billboard" : "Add a new billboard"
-    const toastMessage = initialData ? "Billboard updated" : "Billboard created"
-    const action = initialData ? "Save changes" : "Create billboard"
+    const title = initialData ? "Edit size" : "Create size"
+    const description = initialData ? "Edit size" : "Add a new size"
+    const toastMessage = initialData ? "Size updated" : "Size created"
+    const action = initialData ? "Save changes" : "Create size"
     
-    const form = useForm<BillboardFormValues>({
+    const form = useForm<SizeFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData || {
-            label:"",
-            imageUrl:""
+            name:"",
+            value:""
         },
     });
 
-    const onSubmit = async (data: BillboardFormValues) => {
+    const onSubmit = async (data: SizeFormValues) => {
         try {
             setLoading(true)
             if (initialData) {
-                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`,data)
+                await axios.patch(`/api/${params.storeId}/sizes/${params.sizeId}`,data)
             } else {
-                await axios.post(`/api/${params.storeId}/billboards`,data)
+                await axios.post(`/api/${params.storeId}/sizes`,data)
             }
-            router.push(`/${params.storeId}/billboards`)
+            router.push(`/${params.storeId}/sizes`)
             router.refresh()
             toast.success(toastMessage);
         } catch (error) {
@@ -72,12 +70,12 @@ export default function BillboardForm({initialData}:BillboardFormProps) {
     const onDelette = async () => {
         try {
             setLoading(true)
-            await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`)
-            router.push(`/${params.storeId}/billboards`)
+            await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`)
+            router.push(`/${params.storeId}/sizes`)
             router.refresh()
-            toast.success("Billboard deleted")
+            toast.success("Size deleted")
         } catch (error) {
-            toast.error("Make sure you removed all categories using billboard")
+            toast.error("Make sure you removed all products using this size")
         } finally {
             setLoading(false);
             setOpen(false);
@@ -95,40 +93,34 @@ export default function BillboardForm({initialData}:BillboardFormProps) {
         <div className='flex items-center justify-between'>
                 <Heading title={title}
                 description= {description}/>
-                { initialData && <Button variant = "destructive" size= "icon"onClick={()=>setOpen(true)}>
+                { initialData && <Button variant = "destructive" size= "icon" onClick={()=>setOpen(true)}>
                     <Trash className='h-4 w-4'></Trash>
                 </Button>}
         </div>
         <Separator></Separator>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full ">
-                <FormField 
-                        control={form.control}
-                        name="imageUrl"
-                        render={({field}) =>(
-                            <FormItem >
-                                <FormLabel >Background image</FormLabel>
-                                <FormControl >
-                                    <ImageUpload  
-                                    value = {field.value ? [field.value] : [] }
-                                    disabled = {loading}
-                                    onChange={(url) => field.onChange(url)}
-                                    onRemove={() => field.onChange("")}>
-
-                                    </ImageUpload>
-                                </FormControl>
-                            </FormItem>
-                        )}>
-                    </FormField>
                 <div className='grid grid-cols-3 gap-8'>
                     <FormField 
                     control={form.control}
-                    name="label"
+                    name="name"
                     render={({field}) =>(
                         <FormItem >
                             <FormLabel >Name</FormLabel>
                             <FormControl >
-                                <Input  disabled={loading} placeholder="Billboard label" {...field}></Input>
+                                <Input  disabled={loading} placeholder="Size name" {...field}></Input>
+                            </FormControl>
+                        </FormItem>
+                    )}>
+                    </FormField>
+                    <FormField 
+                    control={form.control}
+                    name="value"
+                    render={({field}) =>(
+                        <FormItem >
+                            <FormLabel >Name</FormLabel>
+                            <FormControl >
+                                <Input  disabled={loading} placeholder="Size value" {...field}></Input>
                             </FormControl>
                         </FormItem>
                     )}>
