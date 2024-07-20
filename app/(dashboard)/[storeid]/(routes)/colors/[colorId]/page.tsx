@@ -1,20 +1,20 @@
 import prismaDB from '@/lib/prismadb'
 import React from 'react'
-import SizeForm from './components/size-form';
+import ColorForm from './components/color-form';
 
 export default async function  SizePage( {params} :
-    {params:{sizeId:string}}) {
+    {params:{colorId:string}}) {
 
-    const size = await prismaDB.size.findUnique({
+    const color = await prismaDB.color.findUnique({
         where:{
-            id: params.sizeId
+            id: params.colorId
         }
     });
 
   return (
     <div className="flex-col">
       <div className = 'flex-1 space-y-4 p-8 pt-6'>
-        < SizeForm initialData ={size}></ SizeForm>
+        < ColorForm initialData ={color}></ ColorForm>
 
       </div>
     </div>

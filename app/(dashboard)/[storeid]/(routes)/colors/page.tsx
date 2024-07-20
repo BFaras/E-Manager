@@ -1,16 +1,16 @@
 import React from 'react'
-import SizeClient from './components/size-client'
 import prismaDB from '@/lib/prismadb'
-import { SizeColumn } from './components/columns'
-import { format} from "date-fns";
+import { ColorColumn } from './components/columns'
+import { format } from "date-fns";
+import ColorClient from './components/color-client';
 
-export default async function SizesPage({params}:{
+export default async function ColorsPage({params}:{
   params: {
     storeId: string
   }
 }) {
 
-  const sizes = await prismaDB.size.findMany({
+  const colors = await prismaDB.color.findMany({
     where: {
       storeId: params.storeId
     },
@@ -19,7 +19,7 @@ export default async function SizesPage({params}:{
     }
   })
 
-  const formatedSizes :SizeColumn[] = sizes.map((item)=> ({
+  const formatedColors :ColorColumn[] = colors.map((item)=> ({
     id:item.id,
     name: item.name,
     value: item.value,
@@ -28,9 +28,7 @@ export default async function SizesPage({params}:{
   return (
     <div className='flex-col'>
       <div className ="flex-1 space-y-4 p-8 pt-6">
-        <SizeClient data={formatedSizes}></SizeClient>
-
-
+        <ColorClient data={formatedColors}></ColorClient>
       </div>
     </div>
   )
