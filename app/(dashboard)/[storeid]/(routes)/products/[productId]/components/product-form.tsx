@@ -257,18 +257,6 @@ export default function ProductForm({initialData,categories,colors,sizes}:Produc
                     </FormField>
                     <FormField 
                     control={form.control}
-                    name="price"
-                    render={({field}) =>(
-                        <FormItem >
-                            <FormLabel >Price</FormLabel>
-                            <FormControl >
-                                <Input  type="number" disabled={loading} placeholder="9.99" {...field}></Input>
-                            </FormControl>
-                        </FormItem>
-                    )}>
-                    </FormField>
-                    <FormField 
-                    control={form.control}
                     name="isFeatured"
                     render={({field}) =>(
                         <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>

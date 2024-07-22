@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react'
-import { BillboardColumn } from './columns'
+import { ProductColumn } from './columns'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Copy, Edit, MoreHorizontal, Trash } from 'lucide-react'
@@ -10,7 +10,7 @@ import axios from 'axios';
 import { AlertModal } from '@/app/modals/alert-modal';
 
 interface CellActionProps {
-    data:BillboardColumn
+    data:ProductColumn
 }
 export default function CellAction({data}:CellActionProps) {
 
@@ -22,17 +22,17 @@ export default function CellAction({data}:CellActionProps) {
 
     const onCopy = (id:string) => {
         navigator.clipboard.writeText(id);
-        toast.success("Billboard Id copied to the clipboard");
+        toast.success("Product Id copied to the clipboard");
     }
     
     const onDelette = async () => {
         try {
             setLoading(true)
-            await axios.delete(`/api/${params.storeId}/billboards/${data.id}`)
+            await axios.delete(`/api/${params.storeId}/products/${data.id}`)
             router.refresh()
-            toast.success("Billboard deleted")
+            toast.success("Product deleted")
         } catch (error) {
-            toast.error("Make sure you removed all categories using billboard")
+            toast.error("Make sure you removed all categories using product")
         } finally {
             setLoading(false);
             setOpen(false);
@@ -62,7 +62,7 @@ export default function CellAction({data}:CellActionProps) {
                 <Copy className='mr-2 h-4 w-4'></Copy>
                 Copy Id
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={()=> router.push(`/${params.storeId}/billboards/${data.id}`)}>
+            <DropdownMenuItem onClick={()=> router.push(`/${params.storeId}/products/${data.id}`)}>
                 <Edit className='mr-2 h-4 w-4'></Edit>
                 Update
             </DropdownMenuItem>
