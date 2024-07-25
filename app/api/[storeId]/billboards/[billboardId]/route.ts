@@ -111,10 +111,6 @@ export async function DELETE (
         }
 
 
-
-
-        console.log(params.storeId)
-
         const billboard = await prismaDB.billboard.deleteMany({
             where: {
                 id:params.billboardId

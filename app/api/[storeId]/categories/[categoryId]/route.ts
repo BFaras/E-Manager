@@ -15,6 +15,9 @@ export async function GET (
         const category = await prismaDB.category.findUnique({
             where: {
                 id:params.categoryId
+            },
+            include : {
+                billboard:true,
             } 
             }
         )
@@ -110,7 +113,6 @@ export async function DELETE (
             return new NextResponse("Unauthorized", {status : 403})
         }
 
-        console.log(params.storeId)
 
         const category = await prismaDB.category.deleteMany({
             where: {
