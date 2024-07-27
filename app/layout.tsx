@@ -2,6 +2,7 @@ import { ClerkProvider, RedirectToSignIn, SignInButton, SignedIn, SignedOut, Use
 import './globals.css';
 import { ModalProvider } from '@/providers/modal-provider';
 import { ToasterProvider } from '@/providers/toast-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 export default function RootLayout({
   children,
@@ -15,9 +16,11 @@ export default function RootLayout({
     <ClerkProvider>
           <html>
       <body>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <ToasterProvider></ToasterProvider>
       <ModalProvider/>
       {children}
+      </ThemeProvider>
       </body>
     </html>
   </ClerkProvider>
