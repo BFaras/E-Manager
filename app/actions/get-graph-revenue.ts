@@ -56,7 +56,6 @@ export async function getGraphRevenue(storeId:string) {
         graphData[parseInt(month)].total = monthlyRevenue[parseInt(month)]
     }
 
-    console.log(graphData)
     return graphData;
 
 }

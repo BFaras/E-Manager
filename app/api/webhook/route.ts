@@ -6,16 +6,13 @@ import {stripe} from "@/lib/stripe"
 
 
 export async function POST(req:Request) {
-    console.log("help")
     const body = await req.text();
     const signature = headers().get("Stripe-Signature") as string;
 
     let event:Stripe.Event;
-    
-    console.log("help")
+
     try {
         event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-        console.log(event)
     } catch (err:any) {
         return new NextResponse(`WebhookError: ${err.message}` , {status: 400})
     }
