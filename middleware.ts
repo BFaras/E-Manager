@@ -7,8 +7,15 @@ import { NextResponse } from 'next/server';
   const isProtectedRoute = createRouteMatcher([
     '/api/:path'
   ]);
+
+  const isIgnoredRoute = createRouteMatcher([
+    '/api/webhook', // example ignored route
+  ]);
   
   export default clerkMiddleware((auth, req) => {
+    if (isIgnoredRoute(req)) {
+      return NextResponse.next();
+    }
     if (isProtectedRoute(req)) auth().protect();
   });
   

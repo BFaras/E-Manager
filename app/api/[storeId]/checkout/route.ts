@@ -17,12 +17,9 @@ export async function POST(req:Request,
     {params}: {params:{storeId:string}}) {
     const {productsId}  = await req.json();
 
-    console.log(productsId)
-
     if(!productsId || productsId.length === 0) {
         return new NextResponse('Products IDs are required', {status:400})
     }
-    console.log("help2 ")
     const products = await prismaDB.product.findMany({
         where: {
             id: {
@@ -30,7 +27,6 @@ export async function POST(req:Request,
             }
         }
     })
-    console.log("help ",products)
 
     const listItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
@@ -70,7 +66,7 @@ export async function POST(req:Request,
         phone_number_collection: {
             enabled:true
         },
-        success_url: `${process.env.FRONTEND_STORE_URL}/cart?sucess=1`,
+        success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
         cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
         metadata: {
             orderId:order.id
