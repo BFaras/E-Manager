@@ -32,11 +32,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
       <div className='flex-1 space-y-4 p-8 pt-6'>
         <Heading title = "Dashboard" description="Overview of your store"/>
           <Separator></Separator>
-          <div className='grid gap-4 grid-cols-3'>
+          <div className='grid gap-4 grid-cols-2'>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 '>
-                <CardTitle  className='text-sm font-medium'>Total Revenue</CardTitle>
-                <DollarSign className='h-4 w-4 text-muted-foreground'/>
+                <CardTitle  className='text-lg font-bold'>Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
                   <div className='text-2xl font-bold'>
@@ -46,31 +45,18 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
             </Card>
             <Card>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 '>
-                <CardTitle  className='text-sm font-medium'>Total Sales</CardTitle>
-                <CreditCard className='h-4 w-4 text-muted-foreground'/>
+                <CardTitle  className='text-lg font-bold'>Total Sales</CardTitle>
               </CardHeader>
               <CardContent>
                   <div className='text-2xl font-bold'>
-                    + {salesCount}
-                  </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2 '>
-                <CardTitle  className='text-sm font-medium'>Total Stock</CardTitle>
-                <CreditCard className='h-4 w-4 text-muted-foreground'/>
-              </CardHeader>
-              <CardContent>
-                  <div className='text-2xl font-bold'>
-                    {stockCount}
+                    {salesCount}
                   </div>
               </CardContent>
             </Card>
           </div>
           <Card>
-              <CardHeader className='col-span-4'>
-                <CardTitle  >Overview</CardTitle>
-               
+              <CardHeader className='flex flex-row items-center justify-center space-y-0 pb-4 '>
+              <CardTitle  className='text-3xl font-bold'>Overview</CardTitle>
               </CardHeader>
               <CardContent>
                   <div className='pl-2'>
