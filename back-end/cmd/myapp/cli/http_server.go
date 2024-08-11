@@ -3,7 +3,6 @@ package cli
 
 import (
    "os"
-   "time"
    "github.com/spf13/cobra"
    "go.uber.org/zap"
    "go.uber.org/zap/zapcore"
@@ -19,14 +18,11 @@ var httpServer = &cobra.Command{
    Short:   "Start http server",
    Version: VersionHttpServer,
    RunE: func(cmd *cobra.Command, args []string) (err error) {
-      bws := &zapcore.BufferedWriteSyncer{
-         WS:            os.Stderr,
-         Size:          512 * 1024,
-         FlushInterval: time.Minute,
-      }
-      defer bws.Stop()
-      consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-      core := zapcore.NewCore(consoleEncoder, bws, zapcore.DebugLevel)
+      core := zapcore.NewCore(
+         zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+         zapcore.AddSync(os.Stderr),
+         zapcore.DebugLevel,
+      )
       log := zap.New(core)
 
       cnf := cfg.Sub("app.api.rest")

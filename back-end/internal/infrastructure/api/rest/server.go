@@ -1,39 +1,98 @@
-
 package rest
 
 import (
-	"context"
-	"net"
-	"net/http"
 	"back-end/internal/infrastructure/api/rest/handler"
 	"back-end/internal/infrastructure/api/rest/middleware"
 	"back-end/internal/infrastructure/api/rest/validator"
+	"context"
+	"database/sql"
+	"net"
+	"net/http"
+	"os"
+	_ "github.com/lib/pq"
+
+	"github.com/joho/godotenv"
 	"github.com/juju/errors"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
- )
+
+)
 
 
  type Server struct {
 	echo *echo.Echo
 	log  *zap.Logger
 	cfg  *viper.Viper
+	db   *sql.DB
+ }
+
+ func loadEnvValue(server *Server, prefix string) (string){
+	err := godotenv.Load("../../.bin/.env")
+	if err != nil {
+	 	server.log.Error("Error loading .env file : ",zap.Error(err))
+	}
+	return os.Getenv(prefix)
+ }
+
+ func (*Server) setUpDatabase(server *Server)  {
+
+	server.log.Info("Try to get DB_URL from db")
+
+	dbUrl := loadEnvValue(server,"DB_URL")
+
+	server.log.Info("Successfully loaded the DB URL",zap.String("DB_URL",dbUrl))
+	
+	db, err := sql.Open("postgres", dbUrl)
+	
+	if err != nil {
+		server.log.Info("Connecting to the server was a failure : ",zap.Error(err))
+	}
+
+
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		server.log.Error("Failed to connect to the database : ", zap.Error(err))
+	} else {
+			server.log.Info("Successfully connected to the database")
+	}
+
+	var varaible string
+
+	errNew := db.QueryRow(`SELECT id FROM "public"."Billboard"`).Scan(&varaible)
+
+    if errNew != nil {
+           server.log.Error("Failed to perform the query to the database : ", zap.Error(errNew))
+    } else {
+           server.log.Info("Success at performing the query", zap.String("result",varaible))
+    }
+
+	server.log.Debug(varaible);
+
+	server.db = db
  }
  
  func New(cfg *viper.Viper, log *zap.Logger) (*Server, error) {
+	/*create fb in here and use .env to connect*/
+
 	server := &Server{
 	   echo: echo.New(),
 	   log:  log,
 	   cfg:  cfg,
 	}
- 
+
+	server.log.Info("Start setting up the server...")
+
+	server.setUpDatabase(server)
+
 	server.configure(cfg.Sub("setting"))
  
 	server.routes(
 	   handler.New(),
 	   middleware.New(),
 	)
+	server.log.Debug("Successfully connected the  handlers and middlewares to the server")
  
 	return server, nil
  }

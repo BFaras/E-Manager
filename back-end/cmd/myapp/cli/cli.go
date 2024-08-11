@@ -16,9 +16,10 @@ var cmd = &cobra.Command{
    Long:  `Long Description`,
    PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
       cfg = viper.New()
-      cfg.AddConfigPath(".")
       cfg.AutomaticEnv()
+
       cfg.SetConfigFile(config)
+      cfg.ReadInConfig()
       return cfg.ReadInConfig()
    },
 }
@@ -29,7 +30,6 @@ func Execute() error {
 
 func init() {
    cmd.PersistentFlags().StringVarP(
-      &config, "config", "c", "config.yml",
-      "patht to yaml file",
-   )
+      &config, "config", "c", "../../.bin/config.dev.yaml",
+   "path to file")
 }
