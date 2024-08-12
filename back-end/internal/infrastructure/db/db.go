@@ -7,6 +7,7 @@ import (
     "go.uber.org/zap"
     "github.com/spf13/viper"
 	"github.com/labstack/echo/v4"
+    "back-end/internal/infrastructure/rest"
 )
 
 type Server struct {
@@ -24,7 +25,7 @@ func loadEnvValue(prefix string) (string, error) {
     return os.Getenv(prefix), nil
 }
 
-func SetUpDatabase(server *Server) (*sql.DB,error) {
+func SetUpDatabase(server *rest.Server) (*sql.DB,error) {
     server.log.Info("Trying to get DB_URL from the environment")
 
     dbUrl, err := loadEnvValue("DB_URL")

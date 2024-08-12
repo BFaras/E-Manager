@@ -9,11 +9,7 @@ import (
 	"database/sql"
 	"net"
 	"net/http"
-	"os"
-
 	_ "github.com/lib/pq"
-
-	"github.com/joho/godotenv"
 	"github.com/juju/errors"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
@@ -39,12 +35,20 @@ import (
 
 	server.log.Info("Start setting up the server...")
 
-	server.db,err := db.SetUpDatabase(server)
+	var err error
+
+	server.db, err = db.SetUpDatabase(server)
+
+    if err != nil {
+        return nil, err
+    }
 
 	server.configure(cfg.Sub("setting"))
- 
+	
+	storeRepo := db.NewStoreRepository(server.db)
+
 	server.routes(
-	   handler.New(),
+	   handler.New(storeRepo),
 	   middleware.New(),
 	)
 	server.log.Debug("Successfully connected the  handlers and middlewares to the server")
