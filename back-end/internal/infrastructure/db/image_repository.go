@@ -1,9 +1,38 @@
-package repository
+package db
 
-import ("back-end/internal/domain/entity")
+import (
+	"back-end/internal/domain/entity"
+	"back-end/internal/domain/repository"
+	"database/sql"
+)
 
-type ImageRepository interface {
-    FindByID(id string) (*entity.Image, error)
-    Save(image *entity.Image) error
-
+type imageRepository struct {
+    db *sql.DB
 }
+
+func NewImageRepository(db *sql.DB) repository.ImageRepository {
+    return &imageRepository{db: db}
+}
+
+func (r *imageRepository) FindByID(id string) (*entity.Image ,error) {
+    image := &entity.Image{}
+    query := `SELECT * FROM "public"."Image"stores WHERE id = $1;`
+    err := r.db.QueryRow(query, id).Scan(&image.ID, &image.ProductID, &image.Product,&image.URL, &image.CreatedAt, &image.UpdatedAt)
+    if err != nil {
+        return nil, err
+    }
+    return image, nil
+}
+
+func (r *imageRepository) Create(store *entity.Image) error {
+    return nil
+}
+
+func (r *imageRepository) Update(store *entity.Image) (*entity.Image, error) {
+    return nil, nil
+}
+
+func (r *imageRepository) Delete(id string) error {
+    return nil
+}
+

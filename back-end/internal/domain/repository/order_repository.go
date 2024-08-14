@@ -4,6 +4,7 @@ import "back-end/internal/domain/entity"
 
 type OrderRepository interface {
     FindByID(id string) (*entity.Order, error)
-    Save(order *entity.Order) error
-    // Add other methods as needed
+    Create(store *entity.Order) error
+    Update(store *entity.Order) (*entity.Order, error)
+    Delete(id string) error
 }

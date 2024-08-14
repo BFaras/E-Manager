@@ -25,15 +25,14 @@ func (r *storeRepository) FindByID(id string) (*entity.Store ,error) {
 }
 
 func (r *storeRepository) Create(store *entity.Store) error {
-
+    return nil
 }
 
-
 func (r *storeRepository) Update(store *entity.Store) (*entity.Store, error) {
-
+    return nil, nil
 }
 
 func (r *storeRepository) Delete(id string) error {
-
+    return nil
 }
 

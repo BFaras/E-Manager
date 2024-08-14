@@ -8,5 +8,5 @@ import (
 
 func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 
-   s.echo.GET("/hello", h.HelloWold)
+   s.Echo.GET("/hello", h.HelloWold)
 }

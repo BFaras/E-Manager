@@ -4,6 +4,7 @@ import ("back-end/internal/domain/entity")
 
 type BillboardRepository interface {
     FindByID(id string) (*entity.Billboard, error)
-    Save(billboard *entity.Billboard) error
-    // Add other methods as needed
+    Create(store *entity.Billboard) error
+    Update(store *entity.Billboard) (*entity.Billboard, error)
+    Delete(id string) error
 }

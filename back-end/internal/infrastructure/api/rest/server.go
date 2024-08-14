@@ -5,39 +5,41 @@ import (
 	"back-end/internal/infrastructure/api/rest/middleware"
 	"back-end/internal/infrastructure/api/rest/validator"
 	"back-end/internal/infrastructure/db"
+	"back-end/internal/infrastructure/logger"
+
 	"context"
 	"database/sql"
 	"net"
 	"net/http"
-	_ "github.com/lib/pq"
+
 	"github.com/juju/errors"
 	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
 
  type Server struct {
-	echo *echo.Echo
-	log  *zap.Logger
-	cfg  *viper.Viper
-	db   *sql.DB
+	Echo *echo.Echo
+	Cfg  *viper.Viper
+	Db   *sql.DB
  }
 
- func New(cfg *viper.Viper, log *zap.Logger) (*Server, error) {
+ func New(cfg *viper.Viper) (*Server, error) {
 	/*create fb in here and use .env to connect*/
 
 	server := &Server{
-	   echo: echo.New(),
-	   log:  log,
-	   cfg:  cfg,
+	   Echo: echo.New(),
+	   Cfg:  cfg,
 	}
 
-	server.log.Info("Start setting up the server...")
+	logger.Info("Start setting up the server...")
 
 	var err error
 
-	server.db, err = db.SetUpDatabase(server)
+
+	server.Db, err = db.SetUpDatabase()
 
     if err != nil {
         return nil, err
@@ -45,13 +47,13 @@ import (
 
 	server.configure(cfg.Sub("setting"))
 	
-	storeRepo := db.NewStoreRepository(server.db)
+	storeRepo := db.NewStoreRepository(server.Db)
 
 	server.routes(
 	   handler.New(storeRepo),
 	   middleware.New(),
 	)
-	server.log.Debug("Successfully connected the  handlers and middlewares to the server")
+	logger.Debug("Successfully connected the  handlers and middlewares to the server")
  
 	return server, nil
  }
@@ -63,13 +65,13 @@ import (
  
 	select {
 	case <-ctx.Done():
-	   s.log.Info("Shutting down the server")
-	   if shutdownErr := s.echo.Shutdown(ctx); shutdownErr != nil {
-		  s.log.Error("Error shutting down the server", zap.Error(shutdownErr))
+		logger.Info("Shutting down the server")
+	   if shutdownErr := s.Echo.Shutdown(ctx); shutdownErr != nil {
+		  logger.Error("Error shutting down the server", zap.Error(shutdownErr))
 		  return shutdownErr
 	   }
 	case err := <-errorChan:
-	   s.log.Fatal("Failed to start HTTP server", zap.Error(err))
+	   logger.Fatal("Failed to start HTTP server", zap.Error(err))
 	   return err
 	}
  
@@ -80,10 +82,10 @@ import (
 	defer close(errorChan)
  
  
-	if err := s.echo.Start(
+	if err := s.Echo.Start(
 	   net.JoinHostPort(
-		  s.cfg.GetString("host"),
-		  s.cfg.GetString("port"),
+		  s.Cfg.GetString("host"),
+		  s.Cfg.GetString("port"),
 	   ),
 	); err != nil && !errors.Is(err, http.ErrServerClosed) {
 	   errorChan <- err
@@ -92,22 +94,22 @@ import (
  
  func (s *Server) configure(cfg *viper.Viper) {
 	if cfg.IsSet("debug") {
-	   s.echo.Debug = cfg.GetBool("debug")
+	   s.Echo.Debug = cfg.GetBool("debug")
 	}
  
 	if cfg.IsSet("hide_banner") {
-	   s.echo.HideBanner = cfg.GetBool("hide_banner")
+	   s.Echo.HideBanner = cfg.GetBool("hide_banner")
 	}
  
 	if cfg.IsSet("hide_port") {
-	   s.echo.HidePort = cfg.GetBool("hide_port")
+	   s.Echo.HidePort = cfg.GetBool("hide_port")
 	}
  
-	s.echo.Validator = validator.New()
-	s.echo.HTTPErrorHandler = handleErrors(s.log, cfg.GetBool("debug"))
+	s.Echo.Validator = validator.New()
+	s.Echo.HTTPErrorHandler = handleErrors(cfg.GetBool("debug"))
  }
  
- func handleErrors(log *zap.Logger, debug bool) echo.HTTPErrorHandler {
+ func handleErrors(debug bool) echo.HTTPErrorHandler {
 	return func(err error, c echo.Context) {
 	   var (
 		  code       = http.StatusInternalServerError
@@ -140,7 +142,7 @@ import (
  
 	   if !c.Response().Committed {
 		  if err != nil && code == http.StatusInternalServerError {
-			 log.Error("An error occurred", zap.Error(err))
+			logger.Error("An error occurred", zap.Error(err))
 		  }
  
 		  if c.Request().Method == echo.HEAD {

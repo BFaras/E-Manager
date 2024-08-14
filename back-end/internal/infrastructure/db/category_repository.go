@@ -17,21 +17,24 @@ func NewCategoryRepository(db *sql.DB) repository.CategoryRepository {
 func (r *categoryRepository) FindByID(id string) (*entity.Category, error) {
     category := &entity.Category{}
     query := `SELECT * FROM "public"."Category" stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&store.ID, &store.Name, &store.UserID, &store.CreatedAt, &store.UpdatedAt)
+    err := r.db.QueryRow(query, id).Scan(&category.ID, &category.StoreID, &category.Store, &category.BillboardID, &category.Billboard,
+        &category.Products, &category.Name,&category.CreatedAt,&category.UpdatedAt)
     if err != nil {
         return nil, err
     }
-    return store, nil
+    return category, nil
 
 }
 
-func (r *categoryRepository) Save(id string) (*entity.Category, error) {
-    category := &entity.Category{}
-    query := `SELECT * FROM "public"."Category" stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&store.ID, &store.Name, &store.UserID, &store.CreatedAt, &store.UpdatedAt)
-    if err != nil {
-        return nil, err
-    }
-    return store, nil
-
+func (r *categoryRepository) Create(store *entity.Category) error {
+    return nil
 }
+
+func (r *categoryRepository) Update(store *entity.Category) (*entity.Category, error) {
+    return nil, nil
+}
+
+func (r *categoryRepository) Delete(id string) error {
+    return nil
+}
+
