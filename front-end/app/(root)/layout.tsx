@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import axiosInstance from "../utils/axios_instance";
 
+
 export default async function SetupLayout({
     children
 } : {
