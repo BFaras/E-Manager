@@ -19,7 +19,6 @@ import (
 	"go.uber.org/zap"
 )
 
-
  type Server struct {
 	Echo *echo.Echo
 	Cfg  *viper.Viper
@@ -38,7 +37,6 @@ import (
 
 	var err error
 
-
 	server.Db, err = db.SetUpDatabase()
 
     if err != nil {
@@ -48,15 +46,24 @@ import (
 	server.configure(cfg.Sub("setting"))
 	
 	storeRepo := db.NewStoreRepository(server.Db)
+	billboardRepo := db.NewBillboardRepository(server.Db)
+	categoryRepo := db.NewCategoryRepository(server.Db)
+	colorRepo := db.NewColorRepository(server.Db)
+	imageRepo := db.NewImageRepository(server.Db)
+	orderItemRepo := db.NewOrderItemRepository(server.Db)
+	orderRepo := db.NewOrderRepository(server.Db)
+	productRepo := db.NewProductRepository(server.Db)
+	sizeRepo := db.NewSizeRepository(server.Db)
 
 	server.routes(
-	   handler.New(storeRepo),
+	   handler.New(storeRepo,billboardRepo,categoryRepo,colorRepo,imageRepo,orderItemRepo,
+	orderRepo,productRepo,sizeRepo),
 	   middleware.New(),
 	)
 	logger.Debug("Successfully connected the  handlers and middlewares to the server")
  
 	return server, nil
- }
+}
  
  func (s *Server) Start(ctx context.Context) error {
 	errorChan := make(chan error, 1)
@@ -156,4 +163,4 @@ import (
 		  }
 	   }
 	}
- }
+}
