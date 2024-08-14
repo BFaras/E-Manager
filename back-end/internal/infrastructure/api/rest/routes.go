@@ -7,6 +7,5 @@ import (
 ) 
 
 func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
-
-   s.Echo.GET("/hello", h.HelloWold)
+   s.Echo.GET("/stores/user/:userId", h.GetStoreByUserId)
 }

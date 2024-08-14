@@ -3,9 +3,9 @@ package entity
 import ("time")
 
 type Store struct {
-	ID string `json:"id"`
+	Id string `json:"id"`
 	Name string `json:"name"`
-	UserID string `json:"userId"`
+	UserId string `json:"userId"`
 	Billboards []Billboard `json:"billboards"`
 	Categories []Category `json:"categories"`
 	Sizes []Size `json:"sizes"`

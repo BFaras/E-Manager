@@ -36,7 +36,7 @@ export function StoreModal() {
 
             window.location.assign(`/${response.data.id}`);
         } catch (error) {
-            toast.error("something wwent wrontg")
+            toast.error("something went wrontg")
         } finally {
             setLoading(false);
         }

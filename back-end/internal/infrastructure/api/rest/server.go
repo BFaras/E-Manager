@@ -23,7 +23,8 @@ import (
 	Echo *echo.Echo
 	Cfg  *viper.Viper
 	Db   *sql.DB
- }
+ } 
+
 
  func New(cfg *viper.Viper) (*Server, error) {
 	/*create fb in here and use .env to connect*/
