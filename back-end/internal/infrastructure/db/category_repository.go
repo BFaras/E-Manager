@@ -17,8 +17,8 @@ func NewCategoryRepository(db *sql.DB) repository.CategoryRepository {
 func (r *categoryRepository) FindByID(id string) (*entity.Category, error) {
     category := &entity.Category{}
     query := `SELECT * FROM "public"."Category" stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&category.ID, &category.StoreID, &category.Store, &category.BillboardID, &category.Billboard,
-        &category.Products, &category.Name,&category.CreatedAt,&category.UpdatedAt)
+    err := r.db.QueryRow(query, id).Scan(&category.Id, &category.StoreId, &category.Store, &category.BillboardId,
+         &category.Name,&category.CreatedAt,&category.UpdatedAt)
     if err != nil {
         return nil, err
     }

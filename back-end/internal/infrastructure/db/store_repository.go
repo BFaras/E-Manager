@@ -26,7 +26,7 @@ func (r *storeRepository) FindById(id string) (*entity.Store ,error) {
 
 func (r *storeRepository) FindByUserId(id string) (*entity.Store ,error) {
     store:= &entity.Store{}
-    query := `SELECT * FROM "public"."Store"stores WHERE "userId" = $1;`
+    query := `SELECT * FROM "public"."Store" stores WHERE "userId" = $1;`
     err := r.db.QueryRow(query, id).Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
     if err != nil {
         return nil, err

@@ -17,8 +17,8 @@ func NewProductRepository(db *sql.DB) repository.ProductRepository {
 func (r *productRepository) FindByID(id string) (*entity.Product ,error) {
     product := &entity.Product{}
     query := `SELECT * FROM "public"."Product"stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&product.ID, &product.StoreID, &product.Store, &product.CategoryID,&product.Category,&product.Name,&product.Price,
-        &product.IsFeatured,&product.IsArchived,&product.SizeID,&product.Size,&product.ColorID,&product.Color, &product.Images, &product.OrderItems, &product.CreatedAt, &product.UpdatedAt)
+    err := r.db.QueryRow(query, id).Scan(&product.Id, &product.StoreId,  &product.CategoryId,&product.Name,&product.Price,
+        &product.IsFeatured,&product.IsArchived,&product.SizeID,&product.ColorID,  &product.CreatedAt, &product.UpdatedAt)
     if err != nil {
         return nil, err
     }

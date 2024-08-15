@@ -17,7 +17,7 @@ func NewOrderItemRepository(db *sql.DB) repository.OrderItemRepository {
 func (r *orderItemRepository) FindByID(id string) (*entity.OrderItem ,error) {
     orderItem := &entity.OrderItem{}
     query := `SELECT * FROM "public"."OrderItem"stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.Order,&orderItem.ProductID,&orderItem.Product)
+    err := r.db.QueryRow(query, id).Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId)
     if err != nil {
         return nil, err
     }

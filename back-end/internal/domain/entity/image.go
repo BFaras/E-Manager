@@ -3,9 +3,8 @@ package entity
 import "time"
 
 type Image struct {
-    ID        string    `json:"id"`
-    ProductID string    `json:"productId"`
-    Product   Product   `json:"product"`
+    Id       string    `json:"id"`
+    ProductId string    `json:"productId"`
     URL       string    `json:"url"`
     CreatedAt time.Time `json:"createdAt"`
     UpdatedAt time.Time `json:"updatedAt"`

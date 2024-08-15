@@ -17,7 +17,7 @@ func NewBillboardRepository(db *sql.DB) repository.BillboardRepository {
 func (r *billboardRepository) FindByID(id string) (*entity.Billboard ,error) {
     billboard := &entity.Billboard{}
     query := `SELECT * FROM "public"."Billboard"stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&billboard.ID, &billboard.StoreID, &billboard.Store,&billboard.Label,&billboard.ImageURL,&billboard.Categories,
+    err := r.db.QueryRow(query, id).Scan(&billboard.Id, &billboard.StoreId, &billboard.Label,&billboard.ImageUrl,
         &billboard.CreatedAt, &billboard.UpdatedAt)
     if err != nil {
         return nil, err

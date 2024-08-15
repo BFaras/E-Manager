@@ -16,22 +16,18 @@ export default async function SetupLayout({
     }
 
     console.log("test golang please work")
+    let store: any;
 
     try {
         const response = await axiosInstance.get(`/stores/user/${userId}`)
         console.log("test golang please work")
         console.log(response)
+        store = response.data;
 
-    } catch (err) {
+    } catch (err: any) {
         console.log("help with error")
         console.log(err)
     }
-
-    const store = await prismaDB.store.findFirst({
-        where: {
-            userId
-        }
-    })
 
     if (store){
         redirect(`/${store.id}`)

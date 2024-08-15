@@ -3,12 +3,10 @@ package entity
 import ("time")
 
 type Billboard struct {
-	ID string `json:"id"`
-	StoreID string `json:"storeId"`
-	Store Store `json:"store"`
+	Id string `json:"id"`
+	StoreId string `json:"storeId"`
 	Label string `json:"label"`
-	ImageURL string `json:"imageUrl"`
-	Categories []Category `json:"categories"`
+	ImageUrl string `json:"imageUrl"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

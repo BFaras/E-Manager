@@ -3,10 +3,8 @@ package entity
 import "time"
 
 type Order struct {
-    ID         string      `json:"id"`
-    StoreID    string      `json:"storeId"`
-    Store      Store       `json:"store"`
-    OrderItems []OrderItem `json:"orderItems"`
+    Id         string      `json:"id"`
+    StoreId    string      `json:"storeId"`
     IsPaid     bool        `json:"isPaid"`
     Phone      string      `json:"phone"`
     Address    string      `json:"address"`
