@@ -7,7 +7,8 @@ type StoreRepository interface {
     Create(store *entity.Store) error
     Update(store *entity.Store) (*entity.Store, error)
     Delete(id string) error
-    FindByUserId(id string) (*entity.Store, error)
+    FindByUserId(userId string) (*entity.Store, error)
+    FindAllByUserId(userId string) ([]*entity.Store, error)
+    FindByIdAndUserId(id string,userId string) (*entity.Store, error)
     
-    // Add other methods as needed
 }

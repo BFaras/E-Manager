@@ -24,11 +24,41 @@ func (r *storeRepository) FindById(id string) (*entity.Store ,error) {
     return store, nil
 }
 
-func (r *storeRepository) FindByUserId(id string) (*entity.Store ,error) {
+func (r *storeRepository) FindByUserId(userId string) (*entity.Store ,error) {
     store:= &entity.Store{}
-    query := `SELECT * FROM "public"."Store" stores WHERE "userId" = $1;`
-    err := r.db.QueryRow(query, id).Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
+    query := `SELECT * FROM "public"."Store" stores WHERE "userId" = $1 LIMIT 1;`
+    err := r.db.QueryRow(query, userId).Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
     if err != nil {
+        return nil, err
+    }
+    return store, nil
+}
+
+func (r *storeRepository) FindAllByUserId(userId string) ([]*entity.Store, error) {
+    var stores []*entity.Store
+    query := `SELECT * FROM "public"."Store" WHERE "userId" = $1`
+    rows, err := r.db.Query(query, userId)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        store := &entity.Store{}
+        err := rows.Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
+        if err != nil {
+            return nil, err
+        }
+        stores = append(stores, store)
+    }
+    return stores, nil
+}
+
+func (r *storeRepository) FindByIdAndUserId(id string ,userId string) (*entity.Store, error) {
+    store:= &entity.Store{}
+    query := `SELECT * FROM "public"."Store" stores WHERE id = $1 AND "userId" = $2;`
+    err := r.db.QueryRow(query, id, userId).Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
+    if err!= nil {
         return nil, err
     }
     return store, nil

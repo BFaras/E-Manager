@@ -1,8 +1,21 @@
-import prismaDB from "@/lib/prismadb";
+
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import axiosInstance from "../utils/axios_instance";
+import { Store } from "@/models/db";
+import toast from "react-hot-toast";
 
+async function fetchStore(userId: string) {
+    try {
+        const response = await axiosInstance.get(`/users/${userId}/store`)
+        return response.data;
+
+    } catch (err: any) {
+        toast.error("Error while getting store", err);
+    }
+
+
+}
 
 export default async function SetupLayout({
     children
@@ -14,20 +27,7 @@ export default async function SetupLayout({
     if (!userId) {
         redirect('/sign-in')
     }
-
-    console.log("test golang please work")
-    let store: any;
-
-    try {
-        const response = await axiosInstance.get(`/stores/user/${userId}`)
-        console.log("test golang please work")
-        console.log(response)
-        store = response.data;
-
-    } catch (err: any) {
-        console.log("help with error")
-        console.log(err)
-    }
+    let store: Store = await fetchStore(userId);
 
     if (store){
         redirect(`/${store.id}`)

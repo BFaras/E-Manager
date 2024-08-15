@@ -19,8 +19,31 @@ func (h *Handler) GetStoreById(c echo.Context) error {
 
 func (h *Handler) GetStoreByUserId(c echo.Context) error {
     logger.Debug("Fetching store by userId...")
-    id := c.Param("userId")
-    store, err := h.storeRepo.FindByUserId(id)
+    userId := c.Param("userId")
+    store, err := h.storeRepo.FindByUserId(userId)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    return c.JSON(http.StatusOK, store)
+}
+
+func (h *Handler) GetStoresByUserId(c echo.Context) error {
+    logger.Debug("Fetching all stores by userId...")
+    userId := c.Param("userId")
+    store, err := h.storeRepo.FindAllByUserId(userId)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    return c.JSON(http.StatusOK, store)
+}
+
+
+
+func (h *Handler) GetStoreByIdAndUserId(c echo.Context) error {
+    logger.Debug("Fetching store by id and userId...")
+    userId := c.Param("userId")
+    id := c.Param("storeId")
+    store, err := h.storeRepo.FindByIdAndUserId(id,userId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }

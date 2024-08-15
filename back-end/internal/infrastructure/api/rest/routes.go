@@ -8,5 +8,7 @@ import (
 
 func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	s.Echo.Use(m.CORSConfig())
-   	s.Echo.GET("/stores/user/:userId", h.GetStoreByUserId)
+   	s.Echo.GET("/users/:userId/store", h.GetStoreByUserId)
+	s.Echo.GET("/users/:userId/stores", h.GetStoresByUserId)
+	s.Echo.GET("/users/:userId/stores/:storeId",  h.GetStoreByIdAndUserId)
 }
