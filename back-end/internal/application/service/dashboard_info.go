@@ -8,8 +8,8 @@ import (
 )
 
 type GraphData struct {
-	Name  string 
-	Total float64
+	Name  string `json:"name"`
+	Total float64 `json:"total"`
 }
 
 type DashboardInfoService struct {
@@ -52,13 +52,13 @@ func (s *DashboardInfoService) GetTotalSales(storeID string) (int64, error) {
     return totalSales, nil
 }
 
-func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]GraphData, error) {
+func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]*GraphData, error) {
 	query := `
-		SELECT o.created_at, p.price
+		SELECT o."createdAt", p."price"
 		FROM "Order" o
-		INNER JOIN "OrderItem" oi ON o.id = oi.orderId
-		INNER JOIN "Product" p ON oi.productId = p.id
-		WHERE o.storeId = $1 AND o.isPaid = TRUE
+		INNER JOIN "OrderItem" oi ON o."id" = oi."orderId"
+		INNER JOIN "Product" p ON oi."productId" = p."id"
+		WHERE o."storeId" = $1 AND o."isPaid" = TRUE
 	`
 
 	rows, err := s.db.Query(query, storeID)
@@ -80,9 +80,10 @@ func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]GraphData, err
 
 		month := int(createdAt.Month()) - 1
 		monthlyRevenue[month] += price
+		
 	}
 
-	graphData := []GraphData{
+	graphData := []*GraphData{
 		{Name: "Jan", Total: 0},
 		{Name: "Feb", Total: 0},
 		{Name: "Mar", Total: 0},
@@ -98,7 +99,7 @@ func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]GraphData, err
 	}
 
 	for month, revenue := range monthlyRevenue {
-		graphData[month].Total = revenue
+		graphData[int(month)].Total = revenue
 	}
 
 	return graphData, nil

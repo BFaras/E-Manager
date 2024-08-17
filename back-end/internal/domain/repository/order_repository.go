@@ -1,6 +1,9 @@
 package repository
 
-import "back-end/internal/domain/entity"
+import (
+	"back-end/internal/application/service"
+	"back-end/internal/domain/entity"
+)
 
 type OrderRepository interface {
     FindByID(id string) (*entity.Order, error)
@@ -9,4 +12,5 @@ type OrderRepository interface {
     Delete(id string) error
     CalculateRevenue(storeId string) (float64,error)
     CalculateSales(storeId string) (int64,error)
+    CalculateGraphRevenue(storeId string) ([]*service.GraphData,error)
 }

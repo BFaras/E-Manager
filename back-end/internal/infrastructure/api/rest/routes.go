@@ -15,5 +15,5 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 
 	s.Echo.GET("stores/:storeId/revenue",  h.GetTotalRevenue)
 	s.Echo.GET("stores/:storeId/sales",  h.GetTotalSales)
-	s.Echo.GET("stores/:storeId/graphRevenue",  h.GetStoreByIdAndUserId)
+	s.Echo.GET("stores/:storeId/graphRevenue",  h.GetGraphRevenue)
 }

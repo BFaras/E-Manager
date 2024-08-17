@@ -5,31 +5,25 @@ import React from 'react'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import { formatter } from '@/lib/utils'
 import { Overview } from '@/components/overview'
-import { getGraphRevenue } from '@/app/actions/get-graph-revenue'
 import axiosInstance from '@/app/utils/axios_instance'
 
 interface DashboardPageProps {
   params: {storeId: string}
 }
 
-interface GraphData {
-  name:string;
-  total:number;
-
+export interface GraphData {
+  Name:string;
+  Total:number;
 }
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
 
-
-  
-  const totalRevenueTest  = await axiosInstance.get(`stores/${params.storeId}/revenue`)
-  const totalRevenue:number = totalRevenueTest.data
+  const responseRevenue  = await axiosInstance.get(`stores/${params.storeId}/revenue`)
+  const totalRevenue:number = responseRevenue.data
   const reponseSales = await axiosInstance.get(`stores/${params.storeId}/sales`)
   const salesCount:number = reponseSales.data
-  
-
-
-  const graphRevenue = await getGraphRevenue(params.storeId)
+  const responseGraphRevenue = await axiosInstance.get(`stores/${params.storeId}/graphRevenue`)
+  const graphRevenue:GraphData[] = responseGraphRevenue.data
 
   return (
     <div className='flex-col'>

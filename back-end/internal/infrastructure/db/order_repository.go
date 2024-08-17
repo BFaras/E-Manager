@@ -5,6 +5,7 @@ import (
 	"back-end/internal/domain/entity"
 	"back-end/internal/domain/repository"
 	"database/sql"
+
 )
 
 type orderRepository struct {
@@ -38,11 +39,20 @@ func (r *orderRepository) CalculateRevenue(storeId string) (float64,error) {
 
 func (r *orderRepository) CalculateSales(storeId string) (int64,error) {
     r.DashboardInfoService = service.NewDashboardInfoService(r.db)
-    totalRevenue,err := r.DashboardInfoService.GetTotalSales(storeId)
+    totalSales,err := r.DashboardInfoService.GetTotalSales(storeId)
     if err != nil {
         return 0, err
     }
-    return totalRevenue, nil
+    return totalSales, nil
+}
+
+func (r *orderRepository) CalculateGraphRevenue(storeId string) ([]*service.GraphData,error) {
+    r.DashboardInfoService = service.NewDashboardInfoService(r.db)
+    graphRevenue,err := r.DashboardInfoService.GetGraphRevenue(storeId) 
+    if err != nil {
+        return nil, err
+    }
+    return graphRevenue, nil
 }
 
 func (r *orderRepository) Create(store *entity.Order) error {
