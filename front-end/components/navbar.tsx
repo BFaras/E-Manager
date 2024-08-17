@@ -10,14 +10,14 @@ import axiosInstance from '@/app/utils/axios_instance'
 import toast from 'react-hot-toast'
 import { Store } from '@/models/db'
 
-async function fetchStore(userId: string): Promise<[]> {
+async function fetchStore(userId: string): Promise<Store[]> {
   try {
       const response = await axiosInstance.get(`/users/${userId}/stores`)
-      console.log(response.data)
-      return response.data;
+      return response.data as Store[];
   } catch (err) {
-      toast.error("Error getting store in dashboard ")
+      toast.error("Error trying to get all stores for navigation ");
   }
+  return []
 }
 
 
@@ -29,12 +29,6 @@ export default async function Navbar() {
   }
 
   let stores: Store[] = await fetchStore(userId)
-  /*
-  const stores = await prismaDB.store.findMany({
-    where: {
-      userId
-    }
-  })*/
 
   return (
     <div className='border-b'>

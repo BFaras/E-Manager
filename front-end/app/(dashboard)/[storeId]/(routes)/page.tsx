@@ -22,8 +22,6 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const salesCount = await getSalesCount(params.storeId)
 
-  const stockCount = await getStockCount(params.storeId)
-
   const graphRevenue = await getGraphRevenue(params.storeId)
 
 

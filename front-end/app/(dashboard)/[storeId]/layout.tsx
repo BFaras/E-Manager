@@ -10,12 +10,10 @@ import toast from "react-hot-toast";
 
 async function fetchStore(userId:string,storeId: string) {
     try {
-        console.log("TRy to get store")
         const response = await axiosInstance.get(`/users/${userId}/stores/${storeId}`)
-        console.log(response.data);
         return response.data;
     } catch (err) {
-        console.log("Failed to get store")
+
     }
 }
 
@@ -37,7 +35,6 @@ export default async function DashboardLayout({
     if (!store) {
         redirect('/')
     }
-
 
     return (
         <>

@@ -78,8 +78,6 @@ export default function StoreSwitcher({
                                         currentStore?.value === store.value? "opacity-100" : "opacity-0"
                                     )}
                                 />
-
-
                             </CommandItem>
                         ))}
                     </CommandGroup>
