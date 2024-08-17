@@ -7,4 +7,6 @@ type OrderRepository interface {
     Create(store *entity.Order) error
     Update(store *entity.Order) (*entity.Order, error)
     Delete(id string) error
+    CalculateRevenue(storeId string) (float64,error)
+    CalculateSales(storeId string) (int64,error)
 }

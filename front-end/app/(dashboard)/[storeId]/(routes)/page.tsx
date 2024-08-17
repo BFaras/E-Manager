@@ -1,29 +1,35 @@
 
 import Heading from '@/components/heading'
-import prismaDB from '@/lib/prismadb'
 import { Separator } from '@radix-ui/react-separator'
 import React from 'react'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
-import { CreditCard, DollarSign } from 'lucide-react'
 import { formatter } from '@/lib/utils'
-import { getTotalRevenue } from '@/app/actions/get-total-revenue'
-import { getSalesCount } from '@/app/actions/get-sales-count'
-import { getStockCount } from '@/app/actions/get-stock-count'
 import { Overview } from '@/components/overview'
 import { getGraphRevenue } from '@/app/actions/get-graph-revenue'
+import axiosInstance from '@/app/utils/axios_instance'
 
 interface DashboardPageProps {
-    params: {storeId: string}
+  params: {storeId: string}
+}
+
+interface GraphData {
+  name:string;
+  total:number;
+
 }
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
 
-  const totalRevenue = await getTotalRevenue(params.storeId)
 
-  const salesCount = await getSalesCount(params.storeId)
+  
+  const totalRevenueTest  = await axiosInstance.get(`stores/${params.storeId}/revenue`)
+  const totalRevenue:number = totalRevenueTest.data
+  const reponseSales = await axiosInstance.get(`stores/${params.storeId}/sales`)
+  const salesCount:number = reponseSales.data
+  
+
 
   const graphRevenue = await getGraphRevenue(params.storeId)
-
 
   return (
     <div className='flex-col'>

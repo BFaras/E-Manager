@@ -37,8 +37,6 @@ func (h *Handler) GetStoresByUserId(c echo.Context) error {
     return c.JSON(http.StatusOK, store)
 }
 
-
-
 func (h *Handler) GetStoreByIdAndUserId(c echo.Context) error {
     logger.Debug("Fetching store by id and userId...")
     userId := c.Param("userId")
