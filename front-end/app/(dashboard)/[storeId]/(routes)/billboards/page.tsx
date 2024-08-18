@@ -3,6 +3,8 @@ import BillboardClient from './components/billboard-client'
 import prismaDB from '@/lib/prismadb'
 import { BillboardColumn } from './components/columns'
 import { format} from "date-fns";
+import axiosInstance from '@/app/utils/axios_instance';
+import { Billboard } from '@/models/db';
 
 export default async function BillboardsPage({params}:{
   params: {
@@ -10,14 +12,8 @@ export default async function BillboardsPage({params}:{
   }
 }) {
 
-  const billboards = await prismaDB.billboard.findMany({
-    where: {
-      storeId: params.storeId
-    },
-    orderBy:{
-      createdAt: 'desc'
-    }
-  })
+  const response = await axiosInstance.get(`billboards/${params.storeId}/billboards`)
+  const billboards:Billboard[] = response.data
 
   const formatedBillboards :BillboardColumn[] = billboards.map((item)=> ({
     id:item.id,

@@ -7,4 +7,6 @@ type BillboardRepository interface {
     Create(store *entity.Billboard) error
     Update(store *entity.Billboard) (*entity.Billboard, error)
     Delete(id string) error
+    GetBillboardsByStoreId(storeId string) ([]*entity.Billboard, error) 
+    DeleteBillboardsByStoreId(storeId string) 
 }

@@ -25,6 +25,41 @@ func (r *billboardRepository) FindByID(id string) (*entity.Billboard ,error) {
     return billboard, nil
 }
 
+func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.Billboard, error) {
+	query := `
+        SELECT *
+        FROM "public"."Billboard"
+        WHERE "storeId" = $1
+        ORDER BY "createdAt" DESC
+    `
+
+	rows, err := r.db.Query(query, storeId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var billboards []*entity.Billboard
+	for rows.Next() {
+		b := &entity.Billboard{}
+		err := rows.Scan(&b.Id, &b.StoreId,&b.Label,&b.ImageUrl,&b.UpdatedAt, &b.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		billboards = append(billboards, b)
+	}
+
+	if err = rows.Err(); err != nil {
+ 		return nil, err
+	}
+
+	return billboards, nil
+}
+
+func (r *billboardRepository) DeleteBillboardsByStoreId(storeId string) {
+	
+}
+
 func (r *billboardRepository) Create(store *entity.Billboard) error {
     return nil
 }

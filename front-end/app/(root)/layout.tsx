@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import axiosInstance from "../utils/axios_instance";
 import { Store } from "@/models/db";
-import toast from "react-hot-toast";
 
 async function fetchStore(userId: string) {
     try {
@@ -11,9 +10,8 @@ async function fetchStore(userId: string) {
         return response.data;
 
     } catch (err: any) {
-        toast.error("Error while getting store", err);
+        //TO DO: redirect to a 500 page 
     }
-
 
 }
 
