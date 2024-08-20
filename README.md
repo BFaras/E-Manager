@@ -1,4 +1,7 @@
-This repository is used with this one :https://github.com/BFaras/E-Commerce
+This repository is designed to work in conjunction with the E-Commerce project. It provides a powerful CMS that enhances your experience in managing your e-commerce platform.
 
-This is a CMS service that make your exprience with your e commerce website better than ever. You can update  the products, the filterts, the billboards and ect. It also offers the possubility for 
-a single user to control as many store as he wants.
+Features
+Effortless Management: Easily update products, filters, billboards, and more.
+Multi-Store Control: Empower a single user to manage multiple stores simultaneously.
+Optimized Experience: Keep your e-commerce site up-to-date and running smoothly with minimal effort.
+This CMS is your key to a more streamlined, efficient, and effective e-commerce management proces
