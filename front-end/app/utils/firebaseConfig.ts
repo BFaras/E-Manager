@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getStorage } from "firebase/storage";
@@ -14,8 +13,7 @@ const firebaseConfig = {
   measurementId: process.env.MEASUREMENT_ID,
 };
 
-
 const app = initializeApp(firebaseConfig);
 const firebaseDB = getStorage(app);
 
-export {firebaseDB, app};
+export { firebaseDB, app };

@@ -1,40 +1,33 @@
-
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import axiosInstance from "../utils/axios_instance";
+import axiosInstance, { setAuthorizationHeader } from "../utils/axios_instance";
 import { Store } from "@/models/db";
 
 async function fetchStore(userId: string) {
-    try {
-        const response = await axiosInstance.get(`/users/${userId}/store`)
-        return response.data;
-
-    } catch (err: any) {
-        //TO DO: redirect to a 500 page 
-    }
-
+  try {
+    const response = await axiosInstance.get(`/users/${userId}/store`);
+    return response.data;
+  } catch (err: any) {
+    throw new Error("Could not fetch any store");
+  }
 }
 
 export default async function SetupLayout({
-    children
-} : {
-    children: React.ReactNode;
+  children,
+}: {
+  children: React.ReactNode;
 }) {
-    const {userId} = auth();
+  const { userId, getToken } = auth();
 
-    if (!userId) {
-        redirect('/sign-in')
-    }
-    let store: Store = await fetchStore(userId);
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-    if (store){
-        redirect(`/${store.id}`)
-    }
+  await setAuthorizationHeader(getToken);
+  let store: Store = await fetchStore(userId);
+  if (store) {
+    redirect(`/${store.id}`);
+  }
 
-    return(
-    <>
-        {children}
-    </>
-    )
-
+  return <>{children}</>;
 }

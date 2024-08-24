@@ -1,41 +1,37 @@
-import SettingForm from '@/components/settings-form';
-import prismaDB from '@/lib/prismadb';
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import React from 'react'
-
+import SettingForm from "@/components/settings-form";
+import prismaDB from "@/lib/prismadb";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import React from "react";
 
 interface SettingPageProps {
-    params:{
-        storeId: string
-    }
+  params: {
+    storeId: string;
+  };
 }
 export default async function SettingsPage({ params }: SettingPageProps) {
+  const { userId } = auth();
 
-    const {userId} = auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-    if(!userId) {
-        redirect("/sign-in")
-    }
+  const store = await prismaDB.store.findFirst({
+    where: {
+      id: params.storeId,
+      userId,
+    },
+  });
 
-    const store = await prismaDB.store.findFirst({
-        where: {
-            id: params.storeId,
-            userId
-        }
-    })
+  if (!store) {
+    redirect("/");
+  }
 
-    if(!store) {
-        redirect("/")
-    }
-    
   return (
     <div className="flex-col">
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <SettingForm initialData={store}></SettingForm>
-        </div>
-      
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <SettingForm initialData={store}></SettingForm>
+      </div>
     </div>
-  )
+  );
 }
-
