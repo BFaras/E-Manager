@@ -12,6 +12,7 @@ export default async function BillboardPage({
   const { getToken } = auth();
 
   await setUpInterceptor(getToken);
+  
   const response = await axiosInstance.get(`billboards/${params.billboardId}`)
   const billboard = response.data;
 

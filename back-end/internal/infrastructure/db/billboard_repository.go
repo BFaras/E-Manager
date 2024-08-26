@@ -16,14 +16,24 @@ func NewBillboardRepository(db *sql.DB) repository.BillboardRepository {
     return &billboardRepository{db: db}
 }
 
-func (r *billboardRepository) FindByID(id string) (*entity.Billboard ,error) {
+func (r *billboardRepository) FindByID(id string) (*entity.Billboard, error) {
     billboard := &entity.Billboard{}
-    query := `SELECT * FROM "public"."Billboard"stores WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&billboard.Id, &billboard.StoreId, &billboard.Label,&billboard.ImageUrl,
-        &billboard.CreatedAt, &billboard.UpdatedAt,&billboard.IsActive)
+    query := `SELECT * FROM "public"."Billboard" WHERE id = $1;`
+    err := r.db.QueryRow(query, id).Scan(
+        &billboard.Id,
+        &billboard.StoreId,
+        &billboard.Label,
+        &billboard.ImageUrl,
+        &billboard.CreatedAt,
+        &billboard.UpdatedAt,
+        &billboard.IsActive,
+    )
+
     if err != nil {
+        logger.Error("Error : ",zap.Error(err))
         return nil, err
     }
+
     return billboard, nil
 }
 
@@ -36,6 +46,7 @@ func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.
     `
 	rows, err := r.db.Query(query, storeId)
 	if err != nil {
+        logger.Error("Error : ",zap.Error(err))
 		return nil, err
 	}
 	defer rows.Close()
@@ -45,6 +56,7 @@ func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.
 		b := &entity.Billboard{}
 		err := rows.Scan(&b.Id, &b.StoreId,&b.Label,&b.ImageUrl,&b.CreatedAt,&b.UpdatedAt,&b.IsActive)
 		if err != nil {
+            logger.Error("Error : ",zap.Error(err))
 			return nil, err
 		}
 		billboards = append(billboards, b)
@@ -52,6 +64,7 @@ func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.
 	logger.Debug("Getting billboards for store: ", zap.Reflect("billboards",billboards));
 
 	if err = rows.Err(); err != nil {
+        logger.Error("Error : ",zap.Error(err))
  		return nil, err
 	}
 
@@ -68,6 +81,7 @@ func (r *billboardRepository) GetActiveBillboard(storeId string) (*entity.Billbo
 	err := r.db.QueryRow(query, storeId).Scan(&billboard.Id, &billboard.StoreId, &billboard.Label,&billboard.ImageUrl,
         &billboard.CreatedAt, &billboard.UpdatedAt,&billboard.IsActive)
     if err != nil {
+        logger.Error("Error : ",zap.Error(err))
         return nil, err
     }
     return billboard, nil
@@ -78,11 +92,13 @@ func (r *billboardRepository) Delete(id string) error {
     query := `DELETE FROM "public"."Billboard" WHERE id = $1;`
     result, err := r.db.Exec(query, id)
     if err != nil {
+        logger.Error("Error : ",zap.Error(err))
         return err
     }
 
     rowsAffected, err := result.RowsAffected()
     if err != nil {
+        logger.Error("Error : ",zap.Error(err))
         return err
     }
 
