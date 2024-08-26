@@ -9,4 +9,5 @@ type BillboardRepository interface {
     Delete(id string) error
     GetBillboardsByStoreId(storeId string) ([]*entity.Billboard, error) 
     DeleteBillboardsByStoreId(storeId string) 
+    GetActiveBillboard(storeId string) (*entity.Billboard, error)
 }

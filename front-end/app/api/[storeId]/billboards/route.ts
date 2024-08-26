@@ -10,7 +10,7 @@ export async function POST(
     const { userId } = auth();
     const body = await req.json();
 
-    const { label, imageUrl } = body;
+    const { label, imageUrl,isActive } = body;
 
     if (!userId) {
       return new NextResponse("unAuthenticated", { status: 401 });
@@ -38,12 +38,13 @@ export async function POST(
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
+    /*make sure this one has isActive to create it */
 
     const billboard = await prismaDB.billboard.create({
       data: {
         label,
         imageUrl,
-        storeId: params.storeId,
+        storeId: params.storeId
       },
     });
 

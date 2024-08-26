@@ -9,4 +9,5 @@ type Billboard struct {
 	ImageUrl string `json:"imageUrl"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	IsActive bool `json:"isActive"`
 }

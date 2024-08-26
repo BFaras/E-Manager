@@ -13,14 +13,16 @@ export default async function BillboardsPage({
     storeId: string;
   };
 }) {
+  
   const response = await axiosInstance.get(
     `stores/${params.storeId}/billboards`
   );
-  const billboards: Billboard[] = response.data;
+  const billboards: Billboard[] = response.data || [];
 
   const formatedBillboards: BillboardColumn[] = billboards.map((item) => ({
     id: item.id,
     label: item.label,
+    isActive: item.isActive,
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
   }));
   return (

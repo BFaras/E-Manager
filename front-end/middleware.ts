@@ -9,7 +9,8 @@ import { NextResponse } from 'next/server';
   ]);
 
   const isIgnoredRoute = createRouteMatcher([
-    '/api/webhook', // example ignored route
+    '/api/webhook', 
+    '/api/stores',
   ]);
   
   export default clerkMiddleware((auth, req) => {

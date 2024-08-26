@@ -85,6 +85,7 @@ export interface Billboard {
     id: string;
     storeId: string;
     label: string;
+    isActive: boolean;
     imageUrl: string;
     createdAt: Date;
     updatedAt: Date;

@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,10 +22,12 @@ import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
 import { Billboard } from "@prisma/client";
 import ImageUpload from "@/components/ui/image-upload";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   label: z.string().min(1),
   imageUrl: z.string().min(1),
+  isActive: z.boolean().default(false).optional(),
 });
 
 type BillboardFormValues = z.infer<typeof formSchema>;
@@ -50,6 +53,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     defaultValues: initialData || {
       label: "",
       imageUrl: "",
+      isActive: false,
     },
   });
 
@@ -147,6 +151,27 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                       {...field}
                     ></Input>
                   </FormControl>
+                </FormItem>
+              )}
+            ></FormField>
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormLabel>isActive</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    ></Checkbox>
+                  </FormControl>
+                  <div className="space-y-2 leading-none">
+                    <FormLabel>Active</FormLabel>
+                    <FormDescription>
+                      This decides if this billboard will be displayed
+                    </FormDescription>
+                  </div>
                 </FormItem>
               )}
             ></FormField>
