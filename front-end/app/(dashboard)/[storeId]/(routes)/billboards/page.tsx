@@ -1,6 +1,5 @@
 import React from "react";
 import BillboardClient from "./components/billboard-client";
-import prismaDB from "@/lib/prismadb";
 import { BillboardColumn } from "./components/columns";
 import { format } from "date-fns";
 import axiosInstance from "@/app/utils/axios_instance";

@@ -74,8 +74,23 @@ func (r *billboardRepository) GetActiveBillboard(storeId string) (*entity.Billbo
 }
 
 
-func (r *billboardRepository) DeleteBillboardsByStoreId(storeId string) {
-	
+func (r *billboardRepository) Delete(id string) error {
+    query := `DELETE FROM "public"."Billboard" WHERE id = $1;`
+    result, err := r.db.Exec(query, id)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if rowsAffected == 0 {
+        logger.Error("no row found for : ",zap.String("billboardId",id))
+    }
+
+    return nil
 }
 
 func (r *billboardRepository) Create(store *entity.Billboard) error {
@@ -84,9 +99,5 @@ func (r *billboardRepository) Create(store *entity.Billboard) error {
 
 func (r *billboardRepository) Update(store *entity.Billboard) (*entity.Billboard, error) {
     return nil, nil
-}
-
-func (r *billboardRepository) Delete(id string) error {
-    return nil
 }
 

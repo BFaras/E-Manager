@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import axiosInstance, { setAuthorizationHeader } from "../utils/axios_instance";
+import axiosInstance, {  setUpInterceptor } from "../utils/axios_instance";
 import { Store } from "@/models/db";
 
 async function fetchStore(userId: string) {
@@ -22,7 +22,7 @@ export default async function SetupLayout({
     redirect("/sign-in");
   }
 
-  await setAuthorizationHeader(getToken);
+  await setUpInterceptor(getToken);
   let store: Store = await fetchStore(userId);
   if (store) {
     redirect(`/${store.id}`);

@@ -8,14 +8,21 @@ const axiosInstance = axios.create({
   },
 });
 
-export async function setAuthorizationHeader(
-  getToken: () => Promise<string | null>
-) {
-  const token = await getToken();
-  if (!token) {
-    throw new Error("There is no token ");
-  }
-  axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+export async function setUpInterceptor(getToken: () => Promise<string | null>) {
+  axiosInstance.interceptors.request.use(
+    async (config) => {
+      const token = await getToken();
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      } else {
+        throw new Error("No token available");
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 }
 
 export default axiosInstance;

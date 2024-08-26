@@ -7,6 +7,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (h *Handler) GetAllStores(c echo.Context) error {
+    logger.Debug("Fetching all stores...")
+    store, err := h.storeRepo.FindAllStores()
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    return c.JSON(http.StatusOK, store)
+}
+
 func (h *Handler) GetStoreById(c echo.Context) error {
     logger.Debug("Fetching store by storeId...")
     id := c.Param("id")

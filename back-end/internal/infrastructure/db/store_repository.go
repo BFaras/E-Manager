@@ -24,6 +24,26 @@ func (r *storeRepository) FindById(id string) (*entity.Store ,error) {
     return store, nil
 }
 
+func (r *storeRepository) FindAllStores() ([]*entity.Store, error) {
+    var stores []*entity.Store
+    query := `SELECT * FROM "public"."Store"`
+    rows, err := r.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        store := &entity.Store{}
+        err := rows.Scan(&store.Id, &store.Name, &store.UserId, &store.CreatedAt, &store.UpdatedAt)
+        if err != nil {
+            return nil, err
+        }
+        stores = append(stores, store)
+    }
+    return stores, nil
+}
+
 func (r *storeRepository) FindByUserId(userId string) (*entity.Store ,error) {
     store:= &entity.Store{}
     query := `SELECT * FROM "public"."Store" stores WHERE "userId" = $1 LIMIT 1;`

@@ -14,11 +14,14 @@ import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { AlertModal } from "@/app/modals/alert-modal";
+import { useAuth } from "@clerk/nextjs";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 interface CellActionProps {
   data: BillboardColumn;
 }
 export default function CellAction({ data }: CellActionProps) {
+  const { getToken } = useAuth();
   const router = useRouter();
   const params = useParams();
 
@@ -33,7 +36,8 @@ export default function CellAction({ data }: CellActionProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/billboards/${data.id}`);
+      await setUpInterceptor(getToken);
+      await axiosInstance.delete(`/stores/${params.storeId}/billboards/${data.id}`)
       router.refresh();
       toast.success("Billboard deleted");
     } catch (error) {

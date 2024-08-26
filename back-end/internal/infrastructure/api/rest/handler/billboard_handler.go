@@ -7,6 +7,17 @@ import (
 	"go.uber.org/zap"
 )
 
+func (h* Handler) GetBillboardById(c echo.Context) (error) {
+	logger.Debug("Fetching billboard by id...")
+    billboardId := c.Param("billboardId")
+    billboard, err := h.billboardRepo.FindByID(billboardId)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    logger.Debug("got billboard", zap.Reflect("billboard", billboard))
+    return c.JSON(http.StatusOK, billboard)
+}
+
 func (h *Handler) GetBillboardsByStoreId(c echo.Context) (error) {
 	logger.Debug("Fetching all billboards by storeId...")
 	storeId := c.Param("storeId")
@@ -30,12 +41,12 @@ func (h *Handler) GetActiveBillboardForSpecificStore(c echo.Context) (error) {
 }
 
 
-func (h *Handler) DeleteBillboardsByStoreId(c echo.Context) (error) {
-	logger.Debug("Deleteing all billboards by storeId...")
-	storeId := c.Param("storeId")
-	store, err := h.billboardRepo.GetBillboardsByStoreId(storeId)
+func (h *Handler) DeleteByBillboardId(c echo.Context) (error) {
+	logger.Debug("Deleting billboard by id...")
+	billboardId := c.Param("billboardId")
+	err := h.billboardRepo.Delete(billboardId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, store)
+	return c.NoContent(http.StatusOK)
 }
