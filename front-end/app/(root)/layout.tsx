@@ -8,7 +8,6 @@ async function fetchStore(userId: string) {
     const response = await axiosInstance.get(`/users/${userId}/store`);
     return response.data;
   } catch (err: any) {
-    throw new Error("Could not fetch any store");
   }
 }
 

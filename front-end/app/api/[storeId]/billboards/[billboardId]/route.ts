@@ -60,6 +60,7 @@ export async function PATCH(
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
+    /*make sure this one has isActive to patch it */
 
     const billboard = await prismaDB.billboard.updateMany({
       where: {
