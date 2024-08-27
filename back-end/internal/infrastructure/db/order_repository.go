@@ -10,11 +10,13 @@ import (
 
 type orderRepository struct {
     db *sql.DB
-    DashboardInfoService *service.DashboardInfoService
+    dashboardInfoService *service.DashboardInfoService
 }
 
 func NewOrderRepository(db *sql.DB) repository.OrderRepository {
-    return &orderRepository{db: db}
+    return &orderRepository{
+        db: db,
+        dashboardInfoService: service.NewDashboardInfoService(db) }
 }
 
 func (r *orderRepository) FindByID(id string) (*entity.Order ,error) {
@@ -29,8 +31,7 @@ func (r *orderRepository) FindByID(id string) (*entity.Order ,error) {
 }
 
 func (r *orderRepository) CalculateRevenue(storeId string) (float64,error) {
-    r.DashboardInfoService = service.NewDashboardInfoService(r.db)
-    totalRevenue,err := r.DashboardInfoService.GetTotalRevenue(storeId)
+    totalRevenue,err := r.dashboardInfoService.GetTotalRevenue(storeId)
     if err != nil {
         return 0, err
     }
@@ -38,8 +39,7 @@ func (r *orderRepository) CalculateRevenue(storeId string) (float64,error) {
 }
 
 func (r *orderRepository) CalculateSales(storeId string) (int64,error) {
-    r.DashboardInfoService = service.NewDashboardInfoService(r.db)
-    totalSales,err := r.DashboardInfoService.GetTotalSales(storeId)
+    totalSales,err := r.dashboardInfoService.GetTotalSales(storeId)
     if err != nil {
         return 0, err
     }
@@ -47,8 +47,7 @@ func (r *orderRepository) CalculateSales(storeId string) (int64,error) {
 }
 
 func (r *orderRepository) CalculateGraphRevenue(storeId string) ([]*service.GraphData,error) {
-    r.DashboardInfoService = service.NewDashboardInfoService(r.db)
-    graphRevenue,err := r.DashboardInfoService.GetGraphRevenue(storeId) 
+    graphRevenue,err := r.dashboardInfoService.GetGraphRevenue(storeId) 
     if err != nil {
         return nil, err
     }
