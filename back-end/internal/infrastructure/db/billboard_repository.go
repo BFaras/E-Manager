@@ -28,9 +28,12 @@ func (r *billboardRepository) FindByID(id string) (*entity.Billboard, error) {
         &billboard.UpdatedAt,
         &billboard.IsActive,
     )
-
+    
     if err != nil {
         logger.Error("Error : ",zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
         return nil, err
     }
 
@@ -109,9 +112,20 @@ func (r *billboardRepository) Delete(id string) error {
     return nil
 }
 
-func (r *billboardRepository) Create(store *entity.Billboard) error {
+func (r *billboardRepository) Create(billboard *entity.Billboard) error {
+    query := `
+        INSERT INTO "public"."Billboard" ("id", "storeId", "label", "imageUrl", "createdAt", "updatedAt", "isActive")
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `
+    _, err := r.db.Exec(query, billboard.Id, billboard.StoreId, billboard.Label, billboard.ImageUrl, billboard.CreatedAt, billboard.UpdatedAt, billboard.IsActive)
+    if err != nil {
+        logger.Error("Error : ",zap.Error(err))
+        return err
+    }
+
     return nil
 }
+
 
 func (r *billboardRepository) Update(store *entity.Billboard) (*entity.Billboard, error) {
     return nil, nil

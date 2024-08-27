@@ -23,7 +23,6 @@ func (r *categoryRepository) FindByID(id string) (*entity.Category, error) {
         return nil, err
     }
     return category, nil
-
 }
 
 func (r *categoryRepository) Create(store *entity.Category) error {

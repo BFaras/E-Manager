@@ -1,11 +1,21 @@
 package handler
 
 import (
+	"back-end/internal/domain/entity"
 	"back-end/internal/infrastructure/logger"
 	"net/http"
+	"time"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
+	"github.com/google/uuid"
 )
+
+type CreateBillboardRequest struct {
+    StoreId   string `json:"storeId"`
+    Label     string `json:"label"`
+    ImageUrl  string `json:"imageUrl"`
+    IsActive  bool   `json:"isActive"`
+}
 
 func (h* Handler) GetBillboardById(c echo.Context) (error) {
 	logger.Debug("Fetching billboard by id...")
@@ -49,4 +59,36 @@ func (h *Handler) DeleteByBillboardId(c echo.Context) (error) {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusOK)
+}
+
+func (h *Handler) AddBillboard(c echo.Context) error {
+    logger.Debug("Adding new billboard...")
+
+    storeId := c.Param("storeId")
+    var req CreateBillboardRequest
+    if err := c.Bind(&req); err != nil {
+        logger.Error("Failed to bind request: ", zap.Reflect("error", err))
+        return c.JSON(http.StatusBadRequest, "Invalid input")
+    }
+	logger.Debug("this is the request : ",zap.Reflect("req",req))
+
+    billboard := &entity.Billboard{
+        Id:        uuid.New().String(),
+        StoreId:   storeId,
+        Label:     req.Label,
+        ImageUrl:  req.ImageUrl,
+        CreatedAt: time.Now(),
+        UpdatedAt: time.Now(),
+        IsActive:  req.IsActive,
+    }
+
+	logger.Debug("this is the billboard: ",zap.Reflect("billboard",billboard))
+
+    err := h.billboardRepo.Create(billboard)
+    if err != nil {
+        logger.Error("Failed to create billboard: ", zap.Reflect("error", err))
+        return c.JSON(http.StatusInternalServerError, "Failed to create billboard")
+    }
+
+    return c.NoContent(http.StatusOK)
 }

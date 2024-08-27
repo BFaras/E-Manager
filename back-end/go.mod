@@ -12,6 +12,7 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/i4erkasov/go-ddd-cqrs v0.0.0-20240220205325-06f38b2b5884 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
