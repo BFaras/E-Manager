@@ -73,9 +73,9 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
       setLoading(true);
       if (initialData) {
         console.log("doing a patch...")
-        await axiosInstance.patch(`stores/${params.storeId}/billboards/${params.billboardId}`,data)
+        await axiosInstance.patch(`/secured/stores/${params.storeId}/billboards/${params.billboardId}`,data)
       } else {
-        await axiosInstance.post(`stores/${params.storeId}/billboards`,data)
+        await axiosInstance.post(`/secured/stores/${params.storeId}/billboards`,data)
       }
       router.push(`/${params.storeId}/billboards`);
       router.refresh();

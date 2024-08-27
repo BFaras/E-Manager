@@ -37,7 +37,7 @@ export default function CellAction({ data }: CellActionProps) {
     try {
       setLoading(true);
       await setUpInterceptor(getToken);
-      await axiosInstance.delete(`/stores/${params.storeId}/billboards/${data.id}`)
+      await axiosInstance.delete(`/secured/stores/${params.storeId}/billboards/${data.id}`)
       router.refresh();
       toast.success("Billboard deleted");
     } catch (error) {

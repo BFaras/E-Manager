@@ -11,5 +11,7 @@ type StoreRepository interface {
     FindByUserId(userId string) (*entity.Store, error)
     FindAllByUserId(userId string) ([]*entity.Store, error)
     FindByIdAndUserId(id string,userId string) (*entity.Store, error)
+    IsOwnerOfStore(id string,userId string) (bool)
+    
     
 }

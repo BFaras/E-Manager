@@ -3,7 +3,9 @@ package db
 import (
 	"back-end/internal/domain/entity"
 	"back-end/internal/domain/repository"
+	"back-end/internal/infrastructure/logger"
 	"database/sql"
+    "go.uber.org/zap"
 )
 
 type storeRepository struct {
@@ -82,6 +84,21 @@ func (r *storeRepository) FindByIdAndUserId(id string ,userId string) (*entity.S
         return nil, err
     }
     return store, nil
+}
+
+func (r *storeRepository) IsOwnerOfStore(userID string, storeId string) (bool) {
+    var count int
+    query := `
+        SELECT COUNT(*)
+        FROM "public"."Store"
+        WHERE "userId" = $1 AND "id" = $2
+    `
+    err := r.db.QueryRow(query, userID, storeId).Scan(&count)
+    if err != nil {
+        logger.Error("Error : ", zap.Error(err))
+        return false
+    }
+    return count > 0
 }
 
 func (r *storeRepository) Create(store *entity.Store) error {
