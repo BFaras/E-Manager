@@ -24,6 +24,7 @@ func (m *Middleware) CORSConfig() echo.MiddlewareFunc {
 		},
 		AllowMethods: []string{
 			echo.GET,
+            echo.PATCH,
 			echo.POST,
 			echo.PUT,
 			echo.DELETE,

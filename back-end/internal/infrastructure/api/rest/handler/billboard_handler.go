@@ -3,11 +3,12 @@ package handler
 import (
 	"back-end/internal/domain/entity"
 	"back-end/internal/infrastructure/logger"
+	"database/sql"
 	"net/http"
 	"time"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
-	"github.com/google/uuid"
 )
 
 type CreateBillboardRequest struct {
@@ -15,6 +16,12 @@ type CreateBillboardRequest struct {
     Label     string `json:"label"`
     ImageUrl  string `json:"imageUrl"`
     IsActive  bool   `json:"isActive"`
+}
+
+type UpdateBillboardRequest struct {
+    Label     string `json:"label"`   
+    ImageUrl  string `json:"imageUrl"`  
+    IsActive  bool   `json:"isActive"`  
 }
 
 func (h* Handler) GetBillboardById(c echo.Context) (error) {
@@ -88,6 +95,43 @@ func (h *Handler) AddBillboard(c echo.Context) error {
     if err != nil {
         logger.Error("Failed to create billboard: ", zap.Reflect("error", err))
         return c.JSON(http.StatusInternalServerError, "Failed to create billboard")
+    }
+
+    return c.NoContent(http.StatusOK)
+}
+
+func (h *Handler) UpdateBillboard(c echo.Context) error {
+    logger.Debug("Updating billboard...")
+
+    billboardId := c.Param("billboardId")
+    var req UpdateBillboardRequest
+    if err := c.Bind(&req); err != nil {
+        logger.Error("Failed to bind request: ", zap.Reflect("error", err))
+        return c.JSON(http.StatusBadRequest, "Invalid input")
+    }
+    logger.Debug("This is the request: ", zap.Reflect("req", req))
+
+    billboard, err := h.billboardRepo.FindByID(billboardId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            logger.Error("Billboard not found: ", zap.String("billboardId", billboardId))
+            return c.JSON(http.StatusNotFound, "Billboard not found")
+        }
+        logger.Error("Failed to fetch billboard: ", zap.Reflect("error", err))
+        return c.JSON(http.StatusInternalServerError, "Failed to fetch billboard")
+    }
+
+    billboard.Label = req.Label
+    billboard.ImageUrl = req.ImageUrl
+    billboard.UpdatedAt = time.Now()
+    billboard.IsActive = req.IsActive
+
+    logger.Debug("This is the updated billboard: ", zap.Reflect("billboard", billboard))
+
+    err = h.billboardRepo.Update(billboard)
+    if err != nil {
+        logger.Error("Failed to update billboard: ", zap.Reflect("error", err))
+        return c.JSON(http.StatusInternalServerError, "Failed to update billboard")
     }
 
     return c.NoContent(http.StatusOK)

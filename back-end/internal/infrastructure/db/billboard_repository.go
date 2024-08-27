@@ -127,7 +127,18 @@ func (r *billboardRepository) Create(billboard *entity.Billboard) error {
 }
 
 
-func (r *billboardRepository) Update(store *entity.Billboard) (*entity.Billboard, error) {
-    return nil, nil
-}
+func (r *billboardRepository) Update(billboard *entity.Billboard) (error) {
+    query := `
+        UPDATE "public"."Billboard"
+        SET "storeId" = $1, "label" = $2, "imageUrl" = $3, "createdAt" = $4, "updatedAt" = $5, "isActive" = $6
+        WHERE "id" = $7
+    `
 
+    _, err := r.db.Exec(query, billboard.StoreId, billboard.Label, billboard.ImageUrl, billboard.CreatedAt, billboard.UpdatedAt, billboard.IsActive, billboard.Id)
+    if err != nil {
+        logger.Error("Error: ", zap.Error(err))
+        return err
+    }
+
+    return nil
+}

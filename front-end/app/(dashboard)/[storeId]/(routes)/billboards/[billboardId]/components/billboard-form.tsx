@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -60,15 +60,20 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     },
   });
 
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
   const onSubmit = async (data: BillboardFormValues) => {
     try {
-      await setUpInterceptor(getToken)
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/billboards/${params.billboardId}`,
-          data
-        );
+        console.log("doing a patch...")
+        await axiosInstance.patch(`stores/${params.storeId}/billboards/${params.billboardId}`,data)
       } else {
         await axiosInstance.post(`stores/${params.storeId}/billboards`,data)
       }
@@ -76,6 +81,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
       router.refresh();
       toast.success(toastMessage);
     } catch (error) {
+      console.log(error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);

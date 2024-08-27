@@ -22,6 +22,6 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	s.Echo.GET("billboards/:billboardId", h.GetBillboardById)
 	s.Echo.DELETE("stores/:storeId/billboards/:billboardId", h.DeleteByBillboardId)
 	s.Echo.POST("stores/:storeId/billboards", h.AddBillboard)
-	/*s.Echo.PATCH("stores/:storeId/billboards/:billboardId", h.UpdateBillboard)*/
+	s.Echo.PATCH("stores/:storeId/billboards/:billboardId", h.UpdateBillboard)
 	
 }
