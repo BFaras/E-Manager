@@ -23,6 +23,8 @@ import { AlertModal } from "@/app/modals/alert-modal";
 import { Billboard } from "@prisma/client";
 import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   label: z.string().min(1),
@@ -39,6 +41,7 @@ interface BillboardFormProps {
 export default function BillboardForm({ initialData }: BillboardFormProps) {
   const params = useParams();
   const router = useRouter();
+  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -59,6 +62,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
 
   const onSubmit = async (data: BillboardFormValues) => {
     try {
+      await setUpInterceptor(getToken)
       setLoading(true);
       if (initialData) {
         await axios.patch(
@@ -66,7 +70,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/billboards`, data);
+        await axiosInstance.post(`stores/${params.storeId}/billboards`,data)
       }
       router.push(`/${params.storeId}/billboards`);
       router.refresh();
