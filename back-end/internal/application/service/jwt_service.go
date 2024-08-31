@@ -9,8 +9,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
-	"back-end/internal/infrastructure/logger"
 )
 
 type JWTService struct {
@@ -35,8 +33,6 @@ func loadRSAPublicKeyFromEnv(envKey string) (*rsa.PublicKey, error) {
 	if keyString == "" {
 		return nil, fmt.Errorf("public key not found in environment")
 	}
-
-	logger.Debug("Loaded key string", zap.String("keyString", keyString))
 
 	block, _ := pem.Decode([]byte(keyString))
 	if block == nil || block.Type != "PUBLIC KEY" {

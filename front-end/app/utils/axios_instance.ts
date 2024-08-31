@@ -8,7 +8,9 @@ const axiosInstance = axios.create({
   },
 });
 
+
 export async function setUpInterceptor(getToken: () => Promise<string | null>) {
+
   axiosInstance.interceptors.request.use(
     async (config) => {
       const token = await getToken();
@@ -23,6 +25,26 @@ export async function setUpInterceptor(getToken: () => Promise<string | null>) {
       return Promise.reject(error);
     }
   );
-}
 
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
+
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true; 
+
+        const token = await getToken();
+        if (token) {
+          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          return axiosInstance(originalRequest); 
+        }
+      }
+      return Promise.reject(error); 
+    }
+  );
+}
 export default axiosInstance;

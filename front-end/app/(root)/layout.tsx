@@ -5,7 +5,7 @@ import { Store } from "@/models/db";
 
 async function fetchStore(userId: string) {
   try {
-    const response = await axiosInstance.get(`/users/${userId}/store`);
+    const response = await axiosInstance.get(`users/${userId}/store`);
     return response.data;
   } catch (err: any) {
   }
