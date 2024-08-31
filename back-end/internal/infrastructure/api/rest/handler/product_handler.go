@@ -8,7 +8,6 @@ import (
 	"time"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 )
 
 type CreateProductRequest struct {
@@ -43,12 +42,10 @@ func (h *Handler) AddProduct(c echo.Context) error {
     }
     var req CreateProductRequest
     if err := c.Bind(&req); err != nil {
-        logger.Error("Failed to bind request: ", zap.Reflect("error", err))
-        return c.JSON(http.StatusBadRequest, "Invalid input")
+        return c.JSON(http.StatusBadRequest, err.Error())
     }
 
     if !h.storeService.IsOwnerOfStore(storeId, userId) { 
-        logger.Error("User is not authorized to add a product", zap.String("userId", userId))
         return c.JSON(http.StatusForbidden, "You are not authorized to add this product")
     }
 
@@ -68,8 +65,7 @@ func (h *Handler) AddProduct(c echo.Context) error {
 
     err := h.productService.CreateProduct(product)
     if err != nil {
-        logger.Error("Failed to create product: ", zap.Reflect("error", err))
-        return c.JSON(http.StatusInternalServerError, "Failed to create product")
+        return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
     return c.NoContent(http.StatusOK)
@@ -81,30 +77,23 @@ func (h *Handler) UpdateProduct(c echo.Context) error {
     productId := c.Param("productId")
     userId, ok := c.Get("userID").(string)
     if !ok || userId == "" {
-        logger.Error("User ID missing or invalid")
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
 
     var req UpdateProductRequest
     if err := c.Bind(&req); err != nil {
-        logger.Error("Failed to bind request: ", zap.Error(err))
-        return c.JSON(http.StatusBadRequest, "Invalid input")
+        return c.JSON(http.StatusBadRequest, err.Error())
     }
-
-    logger.Debug("This is the request: ", zap.Reflect("req", req))
 
     product, err := h.productService.GetProduct(productId)
     if err != nil {
         if err == sql.ErrNoRows {
-            logger.Error("Product not found", zap.String("productId", productId))
-            return c.JSON(http.StatusNotFound, "Product not found")
+            return c.JSON(http.StatusNotFound, err.Error())
         }
-        logger.Error("Failed to fetch product: ", zap.Error(err))
-        return c.JSON(http.StatusInternalServerError, "Failed to fetch product")
+        return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
     if !h.storeService.IsOwnerOfStore(product.StoreId, userId) { 
-        logger.Error("User is not authorized to update this product", zap.String("userId", userId), zap.String("productId", productId))
         return c.JSON(http.StatusForbidden, "You are not authorized to update this product")
     }
 
@@ -117,11 +106,8 @@ func (h *Handler) UpdateProduct(c echo.Context) error {
     product.IsArchived = req.IsArchived
     product.UpdatedAt = time.Now()
 
-    logger.Debug("This is the updated product: ", zap.Reflect("product", product))
-
     if err := h.productService.UpdateProduct(product); err != nil {
-        logger.Error("Failed to update product: ", zap.Error(err))
-        return c.JSON(http.StatusInternalServerError, "Failed to update product")
+        return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
     return c.NoContent(http.StatusOK)
@@ -133,11 +119,9 @@ func (h *Handler) DeleteProduct(c echo.Context) error {
     storeId := c.Param("storeId")
     userId, ok := c.Get("userID").(string)
     if !ok || userId == "" {
-        logger.Error("User ID missing or invalid")
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
     if !h.storeService.IsOwnerOfStore(storeId, userId) { 
-        logger.Error("User is not authorized to delete this product", zap.String("userId", userId), zap.String("productId", productId))
         return c.JSON(http.StatusForbidden, "You are not authorized to delete this product")
     }
     err := h.productService.DeleteProduct(productId)

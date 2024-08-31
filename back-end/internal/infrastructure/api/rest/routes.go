@@ -27,12 +27,11 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.POST("/stores/:storeId/billboards", h.AddBillboard)
 	secured.PATCH("/stores/:storeId/billboards/:billboardId", h.UpdateBillboard)
 
-	secured.DELETE("/stores/:storeId/categrories/:categoryId", h.DeleteBillboard)
-	secured.POST("/stores/:storeId/categrories", h.AddBillboard)
-	secured.PATCH("/stores/:storeId/categrories/:categoryId", h.UpdateBillboard)
 
-	secured.DELETE("/stores/:storeId/products/:productId", h.DeleteBillboard)
-	secured.POST("/stores/:storeId/products", h.AddBillboard)
-	secured.PATCH("/stores/:storeId/products/:productId", h.UpdateBillboard)
+	secured.GET("/stores/:storeId/categrories/:categoryId", h.GetCategoriesWithBillboard)
+	
+	secured.DELETE("/stores/:storeId/categrories/:categoryId", h.DeleteCategory)
+	secured.POST("/stores/:storeId/categrories", h.AddCategory)
+	secured.PATCH("/stores/:storeId/categrories/:categoryId", h.UpdateCategory)
 	
 }
