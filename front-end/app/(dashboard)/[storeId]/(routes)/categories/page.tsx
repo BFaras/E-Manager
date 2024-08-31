@@ -1,8 +1,10 @@
 import React from "react";
 import CategoryClient from "./components/category-client";
-import prismaDB from "@/lib/prismadb";
 import { CategoryColumn } from "./components/columns";
 import { format } from "date-fns";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { auth } from "@clerk/nextjs/server";
+import { Category } from "@/models/db";
 
 export default async function CategoriesPage({
   params,
@@ -11,19 +13,14 @@ export default async function CategoriesPage({
     storeId: string;
   };
 }) {
-  const categories = await prismaDB.category.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: {
-      billboard: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const {getToken} = auth()
+  await setUpInterceptor(getToken)
 
-  const formatedCategories: CategoryColumn[] = categories.map((item) => ({
+  const response = await axiosInstance.get(`stores/${params.storeId}/categories`)
+
+  const categories:Category[] = response.data || []
+
+  const formatedCategories: CategoryColumn[] = categories.map((item:any) => ({
     id: item.id,
     name: item.name,
     billboardLabel: item.billboard.label,

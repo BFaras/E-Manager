@@ -11,7 +11,7 @@ import { Store } from '@/models/db'
 
 async function fetchStore(userId: string): Promise<Store[]> {
   try {
-      const response = await axiosInstance.get(`/users/${userId}/stores`)
+      const response = await axiosInstance.get(`users/${userId}/stores`)
       return response.data as Store[];
   } catch (err) {
       toast.error("Error trying to get all stores for navigation ");

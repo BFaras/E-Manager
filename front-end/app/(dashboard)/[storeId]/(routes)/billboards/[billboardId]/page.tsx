@@ -1,4 +1,4 @@
-import prismaDB from "@/lib/prismadb";
+
 import React from "react";
 import BillboardForm from "./components/billboard-form";
 import { auth } from "@clerk/nextjs/server";
@@ -10,7 +10,6 @@ export default async function BillboardPage({
   params: { billboardId: string };
 }) {
   const { getToken } = auth();
-
   await setUpInterceptor(getToken);
   
   const response = await axiosInstance.get(`billboards/${params.billboardId}`)

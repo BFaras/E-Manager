@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 async function fetchStore(userId: string, storeId: string) {
   try {
     const response = await axiosInstance.get(
-      `/users/${userId}/stores/${storeId}`
+      `users/${userId}/stores/${storeId}`
     );
     return response.data;
   } catch (err) {}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,8 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -46,6 +48,7 @@ export default function CategoryForm({
 }: CategoryFormProps) {
   const params = useParams();
   const router = useRouter();
+  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,16 +66,25 @@ export default function CategoryForm({
     },
   });
 
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
+
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/categories/${params.categoryId}`,
+        await axiosInstance.patch(
+          `secured/stores/${params.storeId}/categories/${params.categoryId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/categories`, data);
+        await axiosInstance.post(`secured/stores/${params.storeId}/categories`, data);
       }
       router.push(`/${params.storeId}/categories`);
       router.refresh();
@@ -87,13 +99,15 @@ export default function CategoryForm({
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `/api/${params.storeId}/categories/${params.categoryId}`
+      await axiosInstance.delete(
+        `secured/stores/${params.storeId}/categories/${params.categoryId}`
       );
       router.push(`/${params.storeId}/categories`);
       router.refresh();
       toast.success("Category deleted");
     } catch (error) {
+      console.log("help")
+      console.log(error)
       toast.error("Make sure you removed all products using this category");
     } finally {
       setLoading(false);

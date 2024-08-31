@@ -23,34 +23,31 @@ func (r *CategoryRepository) FindByID(id string) (*entity.Category, error) {
     err := r.db.QueryRow(query, id).Scan(&category.Id, &category.StoreId, &category.BillboardId,
          &category.Name,&category.CreatedAt,&category.UpdatedAt)
     if err != nil {
-        return nil, err
+        logger.Error("Error while fetching Category : ",zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
     }
+    return nil, err
+}
     return category, nil
 }
 
-func (r *CategoryRepository) FindCategoriesWithBillboard(storedId string) ([]*dto.CategoryWithBillboardDTO,error) {
+func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto.CategoryWithBillboardDTO,error) {
 
-    query := `SELECT 
-    c."id", 
-    c."storeId", 
-    c."billboardId", 
-    c."name", 
-    c."createdAt", 
-    c."updatedAt",
-    b."id" AS "billboardId", 
-    b."storeId" AS "billboardStoreId", 
-    b."imageUrl", 
-    b."createdAt" AS "billboardCreatedAt", 
-    b."updatedAt" AS "billboardUpdatedAt"
+    query := `SELECT *
     FROM "public"."Category" c
     LEFT JOIN "public"."Billboard" b
     ON c."billboardId" = b."id"
+    WHERE c."storeId" = $1
     ORDER BY c."createdAt" DESC;`
 
-    rows,err := r.db.Query(query)
+    rows,err := r.db.Query(query,storeId)
 
     if err != nil {
         logger.Error("Error executing query:", zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
         return nil, err
     }
 
@@ -59,8 +56,8 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storedId string) ([]*dt
     var categoriesWithBillboard []*dto.CategoryWithBillboardDTO
 
     for rows.Next() {
-        var category *dto.CategoryWithBillboardDTO
-        var billboard *entity.Billboard
+        category := &dto.CategoryWithBillboardDTO{}
+        billboard := &entity.Billboard{}
         
         err := rows.Scan(
             &category.Id,
@@ -99,7 +96,7 @@ func (r *CategoryRepository) Delete(id string) error {
     query := `DELETE FROM "public"."Category" WHERE id = $1;`
     result, err := r.db.Exec(query, id)
     if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        logger.Error("Error while deleting category : ",zap.Error(err))
         return err
     }
 

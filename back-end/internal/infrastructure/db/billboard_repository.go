@@ -30,7 +30,7 @@ func (r *BillboardRepository) FindByID(id string) (*entity.Billboard, error) {
     )
     
     if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        logger.Error("Error while fetching Billboard: ",zap.Error(err))
         if err == sql.ErrNoRows {
             return nil, nil
         }
@@ -49,7 +49,10 @@ func (r *BillboardRepository) FindBillboardsByStoreId(storeId string) ([]*entity
     `
 	rows, err := r.db.Query(query, storeId)
 	if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        logger.Error("Error while fetching Billboard by storeId: ",zap.Error(err))
 		return nil, err
 	}
 	defer rows.Close()
@@ -84,7 +87,10 @@ func (r *BillboardRepository) FindActiveBillboard(storeId string) (*entity.Billb
 	err := r.db.QueryRow(query, storeId).Scan(&billboard.Id, &billboard.StoreId, &billboard.Label,&billboard.ImageUrl,
         &billboard.CreatedAt, &billboard.UpdatedAt,&billboard.IsActive)
     if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        logger.Error("Error while fetching active billboards : ",zap.Error(err))
         return nil, err
     }
     return billboard, nil

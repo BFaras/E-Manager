@@ -12,13 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import { AlertModal } from "@/app/modals/alert-modal";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { useAuth } from "@clerk/nextjs";
 
 interface CellActionProps {
   data: CategoryColumn;
 }
 export default function CellAction({ data }: CellActionProps) {
+  const { getToken } = useAuth();
   const router = useRouter();
   const params = useParams();
 
@@ -33,7 +35,8 @@ export default function CellAction({ data }: CellActionProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/categories/${data.id}`);
+      await setUpInterceptor(getToken);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/categories/${data.id}`);
       router.refresh();
       toast.success("Category deleted");
     } catch (error) {

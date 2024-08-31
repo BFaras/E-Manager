@@ -2,8 +2,9 @@ import React from "react";
 import BillboardClient from "./components/billboard-client";
 import { BillboardColumn } from "./components/columns";
 import { format } from "date-fns";
-import axiosInstance from "@/app/utils/axios_instance";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 import { Billboard } from "@/models/db";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function BillboardsPage({
   params,
@@ -12,6 +13,9 @@ export default async function BillboardsPage({
     storeId: string;
   };
 }) {
+  const { getToken } = auth();
+
+  await setUpInterceptor(getToken);
   
   const response = await axiosInstance.get(
     `stores/${params.storeId}/billboards`

@@ -11,7 +11,24 @@ import (
     "database/sql"
 )
 
+type CategoryRequest struct {
+    Name   string `json:"name"`
+    BillboardId     string `json:"billboardId"`
+}
+
+
+func (h* Handler) GetCategoryById(c echo.Context) (error) {
+	logger.Debug("Fetching category by id...")
+    categoryId := c.Param("categoryId")
+    category, err := h.categoryService.GetCategory(categoryId)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    return c.JSON(http.StatusOK, category)
+}
+
 func (h *Handler) GetCategoriesWithBillboard(c echo.Context) error {
+    logger.Debug("Get categories with billboard by storeId...")
     storeId := c.Param("storeId")
 
     categories, err := h.categoryService.GetCategoriesWithBillboard(storeId)
@@ -24,17 +41,17 @@ func (h *Handler) GetCategoriesWithBillboard(c echo.Context) error {
 
 
 func (h *Handler) DeleteCategory(c echo.Context) (error) {
-	logger.Debug("Deleting billboard by id...")
-	billboardId := c.Param("billboardId")
+	logger.Debug("Deleting category by id...")
+	billboardId := c.Param("categoryId")
 	storeId := c.Param("storeId")
 	userID, ok := c.Get("userID").(string)
 	if !ok || userID == "" {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
 	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
-        return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
+        return c.JSON(http.StatusForbidden, "You are not authorized to delete this category")
     }
-	err := h.billboardService.DeleteBillboard(billboardId)
+	err := h.categoryService.DeleteCategory(billboardId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -42,74 +59,70 @@ func (h *Handler) DeleteCategory(c echo.Context) (error) {
 }
 
 func (h *Handler) AddCategory(c echo.Context) error {
-    logger.Debug("Adding new billboard...")
+    logger.Debug("Adding new category...")
 
     storeId := c.Param("storeId")
 	userID, ok := c.Get("userID").(string)
 	if !ok || userID == "" {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
-    var req CreateBillboardRequest
+    var req CategoryRequest
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
 
 	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
-        return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
+        return c.JSON(http.StatusForbidden, "You are not authorized to update this category")
     }
 
-    billboard := &entity.Billboard{
+    category := &entity.Category{
         Id:        uuid.New().String(),
         StoreId:   storeId,
-        Label:     req.Label,
-        ImageUrl:  req.ImageUrl,
+        Name:     req.Name,
+        BillboardId:  req.BillboardId,
         CreatedAt: time.Now(),
         UpdatedAt: time.Now(),
-        IsActive:  req.IsActive,
     }
 
-    err := h.billboardService.CreateBillboard(billboard)
+    err := h.categoryService.CreateCategory(category)
     if err != nil {
-        return c.JSON(http.StatusInternalServerError, "Failed to create billboard")
+        return c.JSON(http.StatusInternalServerError, "Failed to create category")
     }
 
     return c.NoContent(http.StatusOK)
 }
 
 func (h *Handler) UpdateCategory(c echo.Context) error {
-    logger.Debug("Updating billboard...")
+    logger.Debug("Updating category...")
 
-    billboardId := c.Param("billboardId")
+    categoryId := c.Param("categoryId")
     userID, ok := c.Get("userID").(string)
     if !ok || userID == "" {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
 
-    var req UpdateBillboardRequest
+    var req CategoryRequest
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
 
-    logger.Debug("This is the request: ", zap.Reflect("req", req))
-
-    billboard, err := h.billboardService.GetBillboard(billboardId)
+    category, err := h.categoryService.GetCategory(categoryId)
     if err != nil {
         if err == sql.ErrNoRows {
-            return c.JSON(http.StatusNotFound, "Billboard not found")
+            return c.JSON(http.StatusNotFound, "Category not found")
         }
-        return c.JSON(http.StatusInternalServerError, "Failed to fetch billboard")
+        return c.JSON(http.StatusInternalServerError, "Failed to fetch category")
     }
 
-    if !h.storeService.IsOwnerOfStore(billboard.StoreId, userID) { 
-        return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
+    if !h.storeService.IsOwnerOfStore(category.StoreId, userID) { 
+        return c.JSON(http.StatusForbidden, "You are not authorized to update this category")
     }
 
-    billboard.Label = req.Label
-    billboard.ImageUrl = req.ImageUrl
-    billboard.UpdatedAt = time.Now()
-    billboard.IsActive = req.IsActive
+    category.Name = req.Name
+    category.BillboardId = req.BillboardId
+    category.UpdatedAt = time.Now()
 
-    if err := h.billboardService.UpdateBillboard(billboard); err != nil {
+    if err := h.categoryService.UpdateCategory(category); err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
