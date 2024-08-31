@@ -86,14 +86,14 @@ func (r *storeRepository) FindByIdAndUserId(id string ,userId string) (*entity.S
     return store, nil
 }
 
-func (r *storeRepository) IsOwnerOfStore(userID string, storeId string) (bool) {
+func (r *storeRepository) IsOwnerOfStore(id string, userId string) (bool) {
     var count int
     query := `
         SELECT COUNT(*)
         FROM "public"."Store"
-        WHERE "userId" = $1 AND "id" = $2
+        WHERE "id" = $1 AND "userId" = $2
     `
-    err := r.db.QueryRow(query, userID, storeId).Scan(&count)
+    err := r.db.QueryRow(query, id, userId).Scan(&count)
     if err != nil {
         logger.Error("Error : ", zap.Error(err))
         return false
@@ -105,8 +105,8 @@ func (r *storeRepository) Create(store *entity.Store) error {
     return nil
 }
 
-func (r *storeRepository) Update(store *entity.Store) (*entity.Store, error) {
-    return nil, nil
+func (r *storeRepository) Update(store *entity.Store) (error) {
+    return nil
 }
 
 func (r *storeRepository) Delete(id string) error {

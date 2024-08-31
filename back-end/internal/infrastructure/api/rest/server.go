@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"back-end/internal/application/service"
 	"back-end/internal/infrastructure/api/rest/handler"
 	"back-end/internal/infrastructure/api/rest/middleware"
 	"back-end/internal/infrastructure/api/rest/validator"
@@ -46,19 +47,20 @@ import (
 
 	server.configure(cfg.Sub("setting"))
 	
-	storeRepo := db.NewStoreRepository(server.Db)
-	billboardRepo := db.NewBillboardRepository(server.Db)
-	categoryRepo := db.NewCategoryRepository(server.Db)
-	colorRepo := db.NewColorRepository(server.Db)
-	imageRepo := db.NewImageRepository(server.Db)
-	orderItemRepo := db.NewOrderItemRepository(server.Db)
-	orderRepo := db.NewOrderRepository(server.Db)
-	productRepo := db.NewProductRepository(server.Db)
-	sizeRepo := db.NewSizeRepository(server.Db)
+	storeService := service.NewStoreService(server.Db)
+	billboardService := service.NewBilboardService(server.Db)
+	categoryService := service.NewCategoryService(server.Db)
+	colorService := service.NewColorService(server.Db)
+	imageService :=  service.NewImageService(server.Db)
+	orderItemService := service.NewOrderItemService(server.Db)
+	orderService := service.NewOrderService(server.Db)
+	productService := service.NewProductService(server.Db)
+	sizeService := service.NewSizeService(server.Db)
+	dashboardInfoService := service.NewDashboardInfoService(server.Db)
 
 	server.routes(
-	   handler.New(storeRepo,billboardRepo,categoryRepo,colorRepo,imageRepo,orderItemRepo,
-	orderRepo,productRepo,sizeRepo),
+	   handler.New(storeService,billboardService,categoryService,colorService,imageService,orderItemService,
+		orderService,productService,sizeService, dashboardInfoService),
 	   middleware.New(),
 	)
 	logger.Debug("Successfully connected the  handlers and middlewares to the server")

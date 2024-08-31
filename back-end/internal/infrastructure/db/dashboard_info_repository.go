@@ -1,26 +1,24 @@
-package service
+package db
 
 import (
+	"back-end/internal/domain/entity/dto"
+	"back-end/internal/domain/repository"
 	"back-end/internal/infrastructure/logger"
 	"database/sql"
 	"time"
+
 	"go.uber.org/zap"
 )
 
-type GraphData struct {
-	Name  string `json:"name"`
-	Total float64 `json:"total"`
-}
-
-type DashboardInfoService struct {
+type DashboardInfoRepository struct {
 	db *sql.DB
 }
 
-func NewDashboardInfoService(db *sql.DB) *DashboardInfoService {
-    return &DashboardInfoService{db: db}
+func NewDashboardInfoRepository(db *sql.DB) repository.DashboardInfoRepository {
+    return &DashboardInfoRepository{db: db}
 }
 
-func (s *DashboardInfoService) GetTotalRevenue(storeID string) (float64, error) {
+func (s *DashboardInfoRepository) FindTotalRevenue(storeID string) (float64, error) {
     query := `
         SELECT COALESCE(SUM(p.price), 0)
         FROM "public"."Order" o
@@ -38,7 +36,7 @@ func (s *DashboardInfoService) GetTotalRevenue(storeID string) (float64, error) 
     return totalRevenue, nil
 }
 
-func (s *DashboardInfoService) GetTotalSales(storeID string) (int64, error) {
+func (s *DashboardInfoRepository) FindTotalSales(storeID string) (int64, error) {
     query := `
         SELECT COUNT(*) FROM "public"."Order" o 
         WHERE o."isPaid" = TRUE AND o."storeId" = $1
@@ -52,7 +50,7 @@ func (s *DashboardInfoService) GetTotalSales(storeID string) (int64, error) {
     return totalSales, nil
 }
 
-func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]*GraphData, error) {
+func (s *DashboardInfoRepository) FindGraphRevenue(storeID string) ([]*dto.GraphData, error) {
 	query := `
 		SELECT o."createdAt", p."price"
 		FROM "Order" o
@@ -83,7 +81,7 @@ func (s *DashboardInfoService) GetGraphRevenue(storeID string) ([]*GraphData, er
 		
 	}
 
-	graphData := []*GraphData{
+	graphData := []*dto.GraphData{
 		{Name: "Jan", Total: 0},
 		{Name: "Feb", Total: 0},
 		{Name: "Mar", Total: 0},

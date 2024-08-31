@@ -28,8 +28,8 @@ func (r *sizeRepository) Create(store *entity.Size) error {
     return nil
 }
 
-func (r *sizeRepository) Update(store *entity.Size) (*entity.Size, error) {
-    return nil, nil
+func (r *sizeRepository) Update(store *entity.Size) (error) {
+    return nil
 }
 
 func (r *sizeRepository) Delete(id string) error {

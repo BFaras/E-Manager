@@ -27,7 +27,7 @@ type UpdateBillboardRequest struct {
 func (h* Handler) GetBillboardById(c echo.Context) (error) {
 	logger.Debug("Fetching billboard by id...")
     billboardId := c.Param("billboardId")
-    billboard, err := h.billboardRepo.FindByID(billboardId)
+    billboard, err := h.billboardService.GetBillboard(billboardId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
@@ -38,7 +38,7 @@ func (h* Handler) GetBillboardById(c echo.Context) (error) {
 func (h *Handler) GetBillboardsByStoreId(c echo.Context) (error) {
 	logger.Debug("Fetching all billboards by storeId...")
 	storeId := c.Param("storeId")
-	store, err := h.billboardRepo.GetBillboardsByStoreId(storeId)
+	store, err := h.billboardService.GetBillboardsByStoreId(storeId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -49,7 +49,7 @@ func (h *Handler) GetBillboardsByStoreId(c echo.Context) (error) {
 func (h *Handler) GetActiveBillboardForSpecificStore(c echo.Context) (error) {
 	logger.Debug("Fetching active billboard for a specific store...")
 	storeId := c.Param("storeId")
-	store, err := h.billboardRepo.GetActiveBillboard(storeId)
+	store, err := h.billboardService.GetActiveBillboard(storeId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -58,7 +58,7 @@ func (h *Handler) GetActiveBillboardForSpecificStore(c echo.Context) (error) {
 }
 
 
-func (h *Handler) DeleteByBillboardId(c echo.Context) (error) {
+func (h *Handler) DeleteBillboard(c echo.Context) (error) {
 	logger.Debug("Deleting billboard by id...")
 	billboardId := c.Param("billboardId")
 	storeId := c.Param("storeId")
@@ -67,11 +67,11 @@ func (h *Handler) DeleteByBillboardId(c echo.Context) (error) {
         logger.Error("User ID missing or invalid")
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
-	if !h.storeRepo.IsOwnerOfStore(userID, storeId) { 
+	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
         logger.Error("User is not authorized to delete this billboard", zap.String("userId", userID), zap.String("billboardId", billboardId))
         return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
     }
-	err := h.billboardRepo.Delete(billboardId)
+	err := h.billboardService.DeleteBillboard(billboardId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -93,7 +93,7 @@ func (h *Handler) AddBillboard(c echo.Context) error {
         return c.JSON(http.StatusBadRequest, "Invalid input")
     }
 
-	if !h.storeRepo.IsOwnerOfStore(userID, storeId) { 
+	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
         logger.Error("User is not authorized to add a billboard ", zap.String("userId", userID))
         return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
     }
@@ -108,7 +108,7 @@ func (h *Handler) AddBillboard(c echo.Context) error {
         IsActive:  req.IsActive,
     }
 
-    err := h.billboardRepo.Create(billboard)
+    err := h.billboardService.CreateBillboard(billboard)
     if err != nil {
         logger.Error("Failed to create billboard: ", zap.Reflect("error", err))
         return c.JSON(http.StatusInternalServerError, "Failed to create billboard")
@@ -135,7 +135,7 @@ func (h *Handler) UpdateBillboard(c echo.Context) error {
 
     logger.Debug("This is the request: ", zap.Reflect("req", req))
 
-    billboard, err := h.billboardRepo.FindByID(billboardId)
+    billboard, err := h.billboardService.GetBillboard(billboardId)
     if err != nil {
         if err == sql.ErrNoRows {
             logger.Error("Billboard not found", zap.String("billboardId", billboardId))
@@ -145,7 +145,7 @@ func (h *Handler) UpdateBillboard(c echo.Context) error {
         return c.JSON(http.StatusInternalServerError, "Failed to fetch billboard")
     }
 
-    if !h.storeRepo.IsOwnerOfStore(userID, billboard.StoreId) { 
+    if !h.storeService.IsOwnerOfStore(billboard.StoreId, userID) { 
         logger.Error("User is not authorized to update this billboard", zap.String("userId", userID), zap.String("billboardId", billboardId))
         return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
     }
@@ -157,7 +157,7 @@ func (h *Handler) UpdateBillboard(c echo.Context) error {
 
     logger.Debug("This is the updated billboard: ", zap.Reflect("billboard", billboard))
 
-    if err := h.billboardRepo.Update(billboard); err != nil {
+    if err := h.billboardService.UpdateBillboard(billboard); err != nil {
         logger.Error("Failed to update billboard: ", zap.Error(err))
         return c.JSON(http.StatusInternalServerError, "Failed to update billboard")
     }

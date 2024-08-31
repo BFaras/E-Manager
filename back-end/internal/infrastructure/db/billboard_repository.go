@@ -2,21 +2,21 @@ package db
 
 import (
 	"back-end/internal/domain/entity"
-	"back-end/internal/domain/repository"
+    "back-end/internal/domain/repository"
 	"back-end/internal/infrastructure/logger"
 	"database/sql"
 	"go.uber.org/zap"
 )
 
-type billboardRepository struct {
+type BillboardRepository struct {
     db *sql.DB
 }
 
 func NewBillboardRepository(db *sql.DB) repository.BillboardRepository {
-    return &billboardRepository{db: db}
+    return &BillboardRepository{db: db}
 }
 
-func (r *billboardRepository) FindByID(id string) (*entity.Billboard, error) {
+func (r *BillboardRepository) FindByID(id string) (*entity.Billboard, error) {
     billboard := &entity.Billboard{}
     query := `SELECT * FROM "public"."Billboard" WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(
@@ -40,7 +40,7 @@ func (r *billboardRepository) FindByID(id string) (*entity.Billboard, error) {
     return billboard, nil
 }
 
-func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.Billboard, error) {
+func (r *BillboardRepository) FindBillboardsByStoreId(storeId string) ([]*entity.Billboard, error) {
 	query := `
         SELECT *
         FROM "public"."Billboard"
@@ -74,7 +74,7 @@ func (r *billboardRepository) GetBillboardsByStoreId(storeId string) ([]*entity.
 	return billboards, nil
 }
 
-func (r *billboardRepository) GetActiveBillboard(storeId string) (*entity.Billboard, error) {
+func (r *BillboardRepository) FindActiveBillboard(storeId string) (*entity.Billboard, error) {
 	billboard := &entity.Billboard{}
 	query := `
 	SELECT *
@@ -91,7 +91,7 @@ func (r *billboardRepository) GetActiveBillboard(storeId string) (*entity.Billbo
 }
 
 
-func (r *billboardRepository) Delete(id string) error {
+func (r *BillboardRepository) Delete(id string) error {
     query := `DELETE FROM "public"."Billboard" WHERE id = $1;`
     result, err := r.db.Exec(query, id)
     if err != nil {
@@ -112,7 +112,7 @@ func (r *billboardRepository) Delete(id string) error {
     return nil
 }
 
-func (r *billboardRepository) Create(billboard *entity.Billboard) error {
+func (r *BillboardRepository) Create(billboard *entity.Billboard) error {
     query := `
         INSERT INTO "public"."Billboard" ("id", "storeId", "label", "imageUrl", "createdAt", "updatedAt", "isActive")
         VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -127,7 +127,7 @@ func (r *billboardRepository) Create(billboard *entity.Billboard) error {
 }
 
 
-func (r *billboardRepository) Update(billboard *entity.Billboard) (error) {
+func (r *BillboardRepository) Update(billboard *entity.Billboard) (error) {
     query := `
         UPDATE "public"."Billboard"
         SET "storeId" = $1, "label" = $2, "imageUrl" = $3, "createdAt" = $4, "updatedAt" = $5, "isActive" = $6

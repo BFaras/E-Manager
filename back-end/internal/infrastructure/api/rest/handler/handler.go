@@ -1,34 +1,36 @@
 package handler
 
-import "back-end/internal/domain/repository"
+import (
+	"back-end/internal/application/service"
+)
 
 type Handler struct {
-	storeRepo repository.StoreRepository
-	billboardRepo repository.BillboardRepository 
-	categoryRepo repository.CategoryRepository
-	colorRepo repository.ColorRepository
-	imageRepo repository.ImageRepository
-	orderItemRepo  repository.OrderItemRepository
-	orderRepo  repository.OrderRepository
-	productRepo  repository.ProductRepository
-	sizeRepo  repository.SizeRepository
-
-
+	storeService *service.StoreService
+	billboardService *service.BillboardService
+	categoryService *service.CategoryService
+	colorService *service.ColorService
+	imageService *service.ImageService
+	orderItemService  *service.OrderItemService
+	orderService  *service.OrderService
+	productService  *service.ProductService
+	sizeService  *service.SizeService
+	dashboardInfoService  *service.DashboardInfoService
 	
 }
 
-func New(storeRepo repository.StoreRepository, billboardRepo repository.BillboardRepository, categoryRepo repository.CategoryRepository,
-	colorRepo repository.ColorRepository, imageRepo repository.ImageRepository, orderItemRepo repository.OrderItemRepository, orderRepo repository.OrderRepository,
-	productRepo repository.ProductRepository,sizeRepo repository.SizeRepository) *Handler {
+func New(storeService *service.StoreService, billboardService *service.BillboardService, categoryService *service.CategoryService,
+	colorService *service.ColorService, imageService *service.ImageService, orderItemService *service.OrderItemService, orderService *service.OrderService,
+	productService *service.ProductService,sizeService *service.SizeService,dashboardInfoService  *service.DashboardInfoService) *Handler {
 	return &Handler{
-		storeRepo: storeRepo,
-		billboardRepo: billboardRepo,
-		categoryRepo: categoryRepo,
-		colorRepo: colorRepo,
-        imageRepo: imageRepo,
-        orderItemRepo: orderItemRepo,
-        orderRepo: orderRepo,
-        productRepo: productRepo,
-		sizeRepo: sizeRepo,
+		storeService: storeService,
+		billboardService: billboardService,
+		categoryService: categoryService,
+		colorService: colorService,
+        imageService: imageService,
+        orderItemService: orderItemService,
+        orderService: orderService,
+        productService: productService,
+		sizeService: sizeService,
+		dashboardInfoService: dashboardInfoService,
 	}
 }

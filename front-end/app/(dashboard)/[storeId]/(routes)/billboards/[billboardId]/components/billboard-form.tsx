@@ -91,8 +91,8 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(
-        `/api/${params.storeId}/billboards/${params.billboardId}`
+      await axiosInstance.delete(
+        `secured/stores/${params.storeId}/billboards/${params.billboardId}`
       );
       router.push(`/${params.storeId}/billboards`);
       router.refresh();

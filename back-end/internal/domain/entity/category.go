@@ -5,7 +5,6 @@ import "time"
 type Category struct {
     Id        string    `json:"id"`
     StoreId   string    `json:"storeId"`
-    Store     Store     `json:"store"`
     BillboardId string  `json:"billboardId"`
     Name      string    `json:"name"`
     CreatedAt time.Time `json:"createdAt"`

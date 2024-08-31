@@ -23,8 +23,16 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	s.Echo.GET("stores/:storeId/billboards/active", h.GetActiveBillboardForSpecificStore)
 	s.Echo.GET("billboards/:billboardId", h.GetBillboardById)
 
-	secured.DELETE("/stores/:storeId/billboards/:billboardId", h.DeleteByBillboardId)
+	secured.DELETE("/stores/:storeId/billboards/:billboardId", h.DeleteBillboard)
 	secured.POST("/stores/:storeId/billboards", h.AddBillboard)
 	secured.PATCH("/stores/:storeId/billboards/:billboardId", h.UpdateBillboard)
+
+	secured.DELETE("/stores/:storeId/categrories/:categoryId", h.DeleteBillboard)
+	secured.POST("/stores/:storeId/categrories", h.AddBillboard)
+	secured.PATCH("/stores/:storeId/categrories/:categoryId", h.UpdateBillboard)
+
+	secured.DELETE("/stores/:storeId/products/:productId", h.DeleteBillboard)
+	secured.POST("/stores/:storeId/products", h.AddBillboard)
+	secured.PATCH("/stores/:storeId/products/:productId", h.UpdateBillboard)
 	
 }

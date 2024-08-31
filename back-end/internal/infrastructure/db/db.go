@@ -4,7 +4,6 @@ import (
 	"back-end/internal/infrastructure/logger"
 	"database/sql"
 	"os"
-
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )

@@ -29,8 +29,8 @@ func (r *productRepository) Create(store *entity.Product) error {
     return nil
 }
 
-func (r *productRepository) Update(store *entity.Product) (*entity.Product, error) {
-    return nil, nil
+func (r *productRepository) Update(store *entity.Product) (error) {
+    return nil
 }
 
 func (r *productRepository) Delete(id string) error {
