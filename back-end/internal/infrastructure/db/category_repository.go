@@ -74,6 +74,7 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto
             &billboard.UpdatedAt,
             &billboard.IsActive,
         )
+        
         if err != nil {
             logger.Error("Error scanning row:", zap.Error(err))
             return nil, err
@@ -90,7 +91,6 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto
     
     return categoriesWithBillboard, nil
 }
-
 
 func (r *CategoryRepository) Delete(id string) error {
     query := `DELETE FROM "public"."Category" WHERE id = $1;`
@@ -113,12 +113,12 @@ func (r *CategoryRepository) Delete(id string) error {
     return nil
 }
 
-func (r *CategoryRepository) Create(billboard *entity.Category) error {
+func (r *CategoryRepository) Create(category *entity.Category) error {
     query := `
         INSERT INTO "public"."Category" ("id", "storeId", "name","billboardId","createdAt", "updatedAt")
         VALUES ($1, $2, $3, $4, $5, $6)
     `
-    _, err := r.db.Exec(query, billboard.Id, billboard.StoreId, billboard.Name, billboard.BillboardId, billboard.CreatedAt, billboard.UpdatedAt)
+    _, err := r.db.Exec(query, category.Id, category.StoreId, category.Name, category.BillboardId, category.CreatedAt, category.UpdatedAt)
     if err != nil {
         logger.Error("Error : ",zap.Error(err))
         return err

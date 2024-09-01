@@ -17,7 +17,6 @@ export default async function CategoriesPage({
   await setUpInterceptor(getToken)
 
   const response = await axiosInstance.get(`stores/${params.storeId}/categories`)
-
   const categories:Category[] = response.data || []
 
   const formatedCategories: CategoryColumn[] = categories.map((item:any) => ({

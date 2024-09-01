@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
 import { Size } from "@prisma/client";
-import ImageUpload from "@/components/ui/image-upload";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -36,6 +36,7 @@ interface SizeFormProps {
 export default function SizeForm({ initialData }: SizeFormProps) {
   const params = useParams();
   const router = useRouter();
+  const {getToken} = useAuth();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,14 @@ export default function SizeForm({ initialData }: SizeFormProps) {
   const description = initialData ? "Edit size" : "Add a new size";
   const toastMessage = initialData ? "Size updated" : "Size created";
   const action = initialData ? "Save changes" : "Create size";
+
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
 
   const form = useForm<SizeFormValues>({
     resolver: zodResolver(formSchema),
@@ -57,12 +66,15 @@ export default function SizeForm({ initialData }: SizeFormProps) {
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/sizes/${params.sizeId}`,
+        await axiosInstance.patch(
+          `secured/stores/${params.storeId}/sizes/${params.sizeId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/sizes`, data);
+        await axiosInstance.post(
+          `secured/stores/${params.storeId}/sizes`,
+          data
+        );
       }
       router.push(`/${params.storeId}/sizes`);
       router.refresh();
@@ -77,7 +89,7 @@ export default function SizeForm({ initialData }: SizeFormProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/sizes/${params.sizeId}`)
       router.push(`/${params.storeId}/sizes`);
       router.refresh();
       toast.success("Size deleted");

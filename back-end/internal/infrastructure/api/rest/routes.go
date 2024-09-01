@@ -32,5 +32,11 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.DELETE("stores/:storeId/categories/:categoryId", h.DeleteCategory)
 	secured.POST("stores/:storeId/categories", h.AddCategory)
 	secured.PATCH("stores/:storeId/categories/:categoryId", h.UpdateCategory)
+
+	s.Echo.GET("stores/:storeId/sizes/:sizeId", h.GetSizeById)
+	s.Echo.GET("stores/:storeId/sizes", h.GetAllSizes)
+	secured.DELETE("stores/:storeId/sizes/:sizeId", h.DeleteSize)
+	secured.POST("stores/:storeId/sizes", h.AddSize)
+	secured.PATCH("stores/:storeId/sizes/:sizeId", h.UpdateSize)
 	
 }

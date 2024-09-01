@@ -3,6 +3,8 @@ import SizeClient from "./components/size-client";
 import prismaDB from "@/lib/prismadb";
 import { SizeColumn } from "./components/columns";
 import { format } from "date-fns";
+import { auth } from "@clerk/nextjs/server";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 export default async function SizesPage({
   params,
@@ -11,16 +13,14 @@ export default async function SizesPage({
     storeId: string;
   };
 }) {
-  const sizes = await prismaDB.size.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
 
-  const formatedSizes: SizeColumn[] = sizes.map((item) => ({
+  const {getToken} = auth()
+  await setUpInterceptor(getToken)
+
+  const responseSize = await axiosInstance.get(`stores/${params.storeId}/sizes`)
+  const sizes = responseSize.data || []
+
+  const formatedSizes: SizeColumn[] = sizes.map((item:any) => ({
     id: item.id,
     name: item.name,
     value: item.value,
