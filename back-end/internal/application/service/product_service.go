@@ -2,6 +2,7 @@ package service
 
 import (
 	"back-end/internal/domain/entity"
+	"back-end/internal/domain/entity/dto"
 	"back-end/internal/domain/repository"
 	"back-end/internal/infrastructure/db"
 	"database/sql"
@@ -23,6 +24,22 @@ func (s *ProductService) GetProduct(id string) (*entity.Product, error) {
         return nil, err
     }
     return product, nil
+}
+
+func (s *ProductService) GetAllProductsWithExtraInformationByStoreId(storeId string) ([]*dto.ProductWithExtraInfoDTO, error) {
+    products, err := s.repository.FindAllProductsWithExtraInformationByStoreId(storeId)
+    if err != nil {
+        return nil, err
+    }
+    return products, nil
+}
+
+func (s *ProductService) GetAllProductsWithImageById(storeId string) (*dto.ProductWithImageDTO, error) {
+    products, err := s.repository.FindAllProductsWithImageById(storeId)
+    if err != nil {
+        return nil, err
+    }
+    return products, nil
 }
 
 func (s *ProductService) CreateProduct(product *entity.Product ) (error) {

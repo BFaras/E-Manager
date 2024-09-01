@@ -33,7 +33,7 @@ func (s *DashboardInfoService) GetTotalSales(storeId string) (int64, error) {
     return totalSales, nil
 }
 
-func (s *DashboardInfoService) GetGraphRevenue(storeId string) ([]*dto.GraphData, error) {
+func (s *DashboardInfoService) GetGraphRevenue(storeId string) ([]*dto.GraphDataDTO, error) {
 	totalGraphRevenue, err := s.repository.FindGraphRevenue(storeId)
 	if err!= nil {
         return nil, err

@@ -44,10 +44,11 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto
     rows,err := r.db.Query(query,storeId)
 
     if err != nil {
-        logger.Error("Error executing query:", zap.Error(err))
         if err == sql.ErrNoRows {
             return nil, nil
         }
+        logger.Error("Error executing query:", zap.Error(err))
+
         return nil, err
     }
 

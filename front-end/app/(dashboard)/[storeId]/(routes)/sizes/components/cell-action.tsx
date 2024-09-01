@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { AlertModal } from "@/app/modals/alert-modal";
+import { useAuth } from "@clerk/nextjs";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 interface CellActionProps {
   data: SizeColumn;
@@ -21,6 +23,7 @@ interface CellActionProps {
 export default function CellAction({ data }: CellActionProps) {
   const router = useRouter();
   const params = useParams();
+  const {getToken} = useAuth()
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -33,7 +36,8 @@ export default function CellAction({ data }: CellActionProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/sizes/${data.id}`);
+      await setUpInterceptor(getToken);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/sizes/${data.id}`);
       router.refresh();
       toast.success("Size deleted");
     } catch (error) {

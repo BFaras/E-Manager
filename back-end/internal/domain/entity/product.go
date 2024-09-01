@@ -10,8 +10,8 @@ type Product struct {
     Price      float64   `json:"price"`
     IsFeatured bool      `json:"isFeatured"`
     IsArchived bool      `json:"isArchived"`
-    SizeID     string    `json:"sizeId"`
-    ColorID    string    `json:"colorId"`
+    SizeId     string    `json:"sizeId"`
+    ColorId    string    `json:"colorId"`
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
 }

@@ -10,7 +10,7 @@ interface DashboardPageProps {
   params: { storeId: string };
 }
 
-export interface GraphData {
+export interface GraphDataDTO {
   Name: string;
   Total: number;
 }
@@ -27,7 +27,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   const responseGraphRevenue = await axiosInstance.get(
     `stores/${params.storeId}/graphRevenue`
   );
-  const graphRevenue: GraphData[] = responseGraphRevenue.data;
+  const graphRevenue: GraphDataDTO[] = responseGraphRevenue.data;
 
   return (
     <div className="flex-col">

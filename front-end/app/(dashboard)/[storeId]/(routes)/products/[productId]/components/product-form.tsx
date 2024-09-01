@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@clerk/nextjs";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -45,8 +47,7 @@ const formSchema = z.object({
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-  initialData:
-    | (Product & {
+  initialData: (Product & {
         images: Image[];
       })
     | null;
@@ -59,14 +60,14 @@ export default function ProductForm({
   initialData,
   categories,
   colors,
-  sizes,
+  sizes
 }: ProductFormProps) {
   const params = useParams();
   const router = useRouter();
+  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const title = initialData ? "Edit product" : "Create product";
   const description = initialData ? "Edit product" : "Add a new product";
   const toastMessage = initialData ? "Product updated" : "Product created";
@@ -88,16 +89,24 @@ export default function ProductForm({
         },
   });
 
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/products/${params.productId}`,
+        await axiosInstance.patch(
+          `secured/stores/${params.storeId}/products/${params.productId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/products`, data);
+        await axiosInstance.post(`secured/stores/${params.storeId}/products`, data);
       }
       router.push(`/${params.storeId}/products`);
       router.refresh();
@@ -112,7 +121,7 @@ export default function ProductForm({
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/products/${params.productId}`);
       router.push(`/${params.storeId}/products`);
       router.refresh();
       toast.success("Product deleted");

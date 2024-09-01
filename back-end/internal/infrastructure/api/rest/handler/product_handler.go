@@ -6,30 +6,45 @@ import (
 	"database/sql"
 	"net/http"
 	"time"
+    "back-end/internal/domain/entity/dto"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
-type CreateProductRequest struct {
-    CategoryId string  `json:"categoryId"`
-    Name       string  `json:"name"`
-    Price      float64 `json:"price"`
-    IsFeatured bool    `json:"isFeatured"`
-    IsArchived bool    `json:"isArchived"`
-    SizeID     string  `json:"sizeId"`
-    ColorID    string  `json:"colorId"`
+func (h* Handler) GetProductById(c echo.Context) (error) {
+	logger.Debug("Fetching product by id...")
+    productId := c.Param("productId")
+    product, err := h.productService.GetProduct(productId)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    return c.JSON(http.StatusOK, product)
 }
 
-type UpdateProductRequest struct {
-    CategoryId string  `json:"categoryId"`
-    Name       string  `json:"name"`
-    Price      float64 `json:"price"`
-    IsFeatured bool    `json:"isFeatured"`
-    IsArchived bool    `json:"isArchived"`
-    SizeID     string  `json:"sizeId"`
-    ColorID    string  `json:"colorId"`
+func (h *Handler) GetAllProductsWithExtraInformationByStoreId(c echo.Context) error {
+    logger.Debug("Fetch products with extra category, size and colors by storeId...")
+    storeId := c.Param("storeId")
+    products, err := h.productService.GetAllProductsWithExtraInformationByStoreId(storeId)
+    if err != nil {
+        logger.Error("Error while trying to get all Products with extra info")
+        return c.JSON(http.StatusInternalServerError, zap.Error(err))
+    }
+    return c.JSON(http.StatusOK, products)
 }
 
+func (h *Handler) GetAllProductsWithImageById(c echo.Context) error {
+    logger.Debug("Fetch products with image by storeId...")
+    productId := c.Param("productId")
+    product, err := h.productService.GetAllProductsWithImageById(productId)
+    logger.Debug("here is what it founds", zap.Reflect("product",product))
+    if err != nil {
+        logger.Error("Error while trying to get all Products with images")
+        return c.JSON(http.StatusInternalServerError, zap.Error(err))
+    }
+    return c.JSON(http.StatusOK, product)
+}
 
 func (h *Handler) AddProduct(c echo.Context) error {
     logger.Debug("Adding new product...")
@@ -40,7 +55,7 @@ func (h *Handler) AddProduct(c echo.Context) error {
         logger.Error("User ID missing or invalid")
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
-    var req CreateProductRequest
+    var req *entity.Product
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
@@ -57,8 +72,8 @@ func (h *Handler) AddProduct(c echo.Context) error {
         Price:      req.Price,
         IsFeatured: req.IsFeatured,
         IsArchived: req.IsArchived,
-        SizeID:     req.SizeID,
-        ColorID:    req.ColorID,
+        SizeId:     req.SizeId,
+        ColorId:    req.ColorId,
         CreatedAt:  time.Now(),
         UpdatedAt:  time.Now(),
     }
@@ -80,7 +95,7 @@ func (h *Handler) UpdateProduct(c echo.Context) error {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
 
-    var req UpdateProductRequest
+    var req dto.ProductWithExtraInfoDTO
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
@@ -100,8 +115,8 @@ func (h *Handler) UpdateProduct(c echo.Context) error {
     product.Name = req.Name
     product.Price = req.Price
     product.CategoryId = req.CategoryId
-    product.SizeID = req.SizeID
-    product.ColorID = req.ColorID
+    product.SizeId = req.SizeId
+    product.ColorId = req.ColorId
     product.IsFeatured = req.IsFeatured
     product.IsArchived = req.IsArchived
     product.UpdatedAt = time.Now()

@@ -2,7 +2,7 @@
 
 import prismaDB from "@/lib/prismadb";
 
-interface GraphData {
+interface GraphDataDTO {
     name:string;
     total:number;
 
@@ -37,7 +37,7 @@ export async function getGraphRevenue(storeId:string) {
         monthlyRevenue[month] = (monthlyRevenue[month] || 0) + revenueForOrder;
     };
 
-    const graphData:GraphData[] = [
+    const graphData:GraphDataDTO[] = [
         {name:"Jan", total:0},
         {name:"Feb", total:0},
         {name:"Mar", total:0},

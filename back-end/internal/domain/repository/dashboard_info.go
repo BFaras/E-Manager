@@ -7,7 +7,7 @@ import (
 type DashboardInfoRepository interface {
 	FindTotalRevenue(storeID string) (float64, error) 
 	FindTotalSales(storeID string) (int64, error) 
-	FindGraphRevenue(storeID string) ([]*dto.GraphData, error) 
+	FindGraphRevenue(storeID string) ([]*dto.GraphDataDTO, error) 
 }
 
 

@@ -1,38 +1,31 @@
-import prismaDB from "@/lib/prismadb";
+
 import React from "react";
 import ProductForm from "./components/product-form";
+import { auth } from "@clerk/nextjs/server";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 export default async function ProductPage({
   params,
 }: {
   params: { productId: string; storeId: string };
 }) {
-  const product = await prismaDB.product.findUnique({
-    where: {
-      id: params.productId,
-    },
-    include: {
-      images: true,
-    },
-  });
+  const {getToken} = auth()
+  await setUpInterceptor(getToken)
 
-  const categories = await prismaDB.category.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-  });
+  const responseProducts = await axiosInstance.get(`stores/${params.storeId}/products/${params.productId}/image`)
+  const product = responseProducts.data;
+  console.log("help")
+  console.log(product)
 
-  const sizes = await prismaDB.size.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-  });
+  const responseCategories = await axiosInstance.get(`stores/${params.storeId}/categories`)
+  const categories = responseCategories.data ;
 
-  const colors = await prismaDB.color.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-  });
+
+  const responseSizes = await axiosInstance.get(`stores/${params.storeId}/sizes`)
+  const sizes = responseSizes.data ;
+
+  const responseColors = await axiosInstance.get(`stores/${params.storeId}/colors`)
+  const colors = responseColors.data;
 
   return (
     <div className="flex-col">

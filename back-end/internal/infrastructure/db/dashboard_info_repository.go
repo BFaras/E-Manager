@@ -50,7 +50,7 @@ func (s *DashboardInfoRepository) FindTotalSales(storeID string) (int64, error) 
     return totalSales, nil
 }
 
-func (s *DashboardInfoRepository) FindGraphRevenue(storeID string) ([]*dto.GraphData, error) {
+func (s *DashboardInfoRepository) FindGraphRevenue(storeID string) ([]*dto.GraphDataDTO, error) {
 	query := `
 		SELECT o."createdAt", p."price"
 		FROM "Order" o
@@ -81,7 +81,7 @@ func (s *DashboardInfoRepository) FindGraphRevenue(storeID string) ([]*dto.Graph
 		
 	}
 
-	graphData := []*dto.GraphData{
+	graphData := []*dto.GraphDataDTO{
 		{Name: "Jan", Total: 0},
 		{Name: "Feb", Total: 0},
 		{Name: "Mar", Total: 0},

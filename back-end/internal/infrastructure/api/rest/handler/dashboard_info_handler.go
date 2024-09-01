@@ -3,9 +3,7 @@ package handler
 import (
 	"back-end/internal/infrastructure/logger"
 	"net/http"
-
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 )
 
 func (h *Handler) GetTotalRevenue(c echo.Context) error {
@@ -15,7 +13,6 @@ func (h *Handler) GetTotalRevenue(c echo.Context) error {
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
-	logger.Debug("Got the sales",zap.Float64("sales number ", revenue))
     return c.JSON(http.StatusOK, revenue)
 }
 
@@ -26,7 +23,6 @@ func (h *Handler) GetTotalSales(c echo.Context) error {
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
-	logger.Debug("Got the sales",zap.Int64("sales number ", sales))
     return c.JSON(http.StatusOK, sales)
 }
 
@@ -38,7 +34,6 @@ func (h *Handler) GetGraphRevenue(c echo.Context) error {
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
-	logger.Debug("Got the graph revenue",zap.Reflect("graphValue", graphRevenue))
     return c.JSON(http.StatusOK, graphRevenue)
 }
 

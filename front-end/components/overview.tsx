@@ -1,10 +1,10 @@
 "use client";
 
-import { GraphData } from "@/app/(dashboard)/[storeId]/(routes)/page";
+import { GraphDataDTO } from "@/app/(dashboard)/[storeId]/(routes)/page";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 interface OverviewProps {
-  data: GraphData[];
+  data: GraphDataDTO[];
 }
 
 export function Overview({ data }: OverviewProps) {

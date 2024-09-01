@@ -1,10 +1,10 @@
 import React from "react";
-import BillboardClient from "./components/product-client";
-import prismaDB from "@/lib/prismadb";
 import { ProductColumn } from "./components/columns";
 import { format } from "date-fns";
 import { formatter } from "@/lib/utils";
 import ProductClient from "./components/product-client";
+import { auth } from "@clerk/nextjs/server";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 export default async function ProductsPage({
   params,
@@ -13,26 +13,20 @@ export default async function ProductsPage({
     storeId: string;
   };
 }) {
-  const products = await prismaDB.product.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: {
-      category: true,
-      size: true,
-      color: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const { getToken } = auth();
+  await setUpInterceptor(getToken);
+  
+  const response = await axiosInstance.get(
+    `stores/${params.storeId}/products`
+  );
+  const products: any[] = response.data || [];
 
   const formatedProducts: ProductColumn[] = products.map((item) => ({
     id: item.id,
     name: item.name,
     isFeatured: item.isFeatured,
     isArchived: item.isArchived,
-    price: formatter.format(item.price.toNumber()),
+    price: formatter.format(item.price),
     size: item.size.name,
     category: item.category.name,
     color: item.color.value,
