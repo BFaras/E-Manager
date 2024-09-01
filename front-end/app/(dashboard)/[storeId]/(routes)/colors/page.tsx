@@ -3,23 +3,21 @@ import prismaDB from '@/lib/prismadb'
 import { ColorColumn } from './components/columns'
 import { format } from "date-fns";
 import ColorClient from './components/color-client';
+import axiosInstance, { setUpInterceptor } from '@/app/utils/axios_instance';
+import { auth } from '@clerk/nextjs/server';
 
 export default async function ColorsPage({params}:{
   params: {
     storeId: string
   }
 }) {
+  const {getToken} = auth()
+  await setUpInterceptor(getToken)
 
-  const colors = await prismaDB.color.findMany({
-    where: {
-      storeId: params.storeId
-    },
-    orderBy:{
-      createdAt: 'desc'
-    }
-  })
+  const responseColors = await axiosInstance.get(`stores/${params.storeId}/colors`)
+  const colors = responseColors.data || []
 
-  const formatedColors :ColorColumn[] = colors.map((item)=> ({
+  const formatedColors :ColorColumn[] = colors.map((item:any)=> ({
     id:item.id,
     name: item.name,
     value: item.value,

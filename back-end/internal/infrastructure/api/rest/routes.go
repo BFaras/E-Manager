@@ -10,7 +10,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	s.Echo.Use(m.CORSConfig())
 	secured := s.Echo.Group("secured/")
     secured.Use(m.JWTMiddleware)
-	
+
    	s.Echo.GET("users/:userId/store", h.GetStoreByUserId)
 	s.Echo.GET("users/:userId/stores", h.GetStoresByUserId)
 	s.Echo.GET("users/:userId/stores/:storeId",  h.GetStoreByIdAndUserId)
@@ -38,5 +38,13 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.DELETE("stores/:storeId/sizes/:sizeId", h.DeleteSize)
 	secured.POST("stores/:storeId/sizes", h.AddSize)
 	secured.PATCH("stores/:storeId/sizes/:sizeId", h.UpdateSize)
+
+	s.Echo.GET("stores/:storeId/colors/:colorId", h.GetColorById)
+	s.Echo.GET("stores/:storeId/colors", h.GetAllColors)
+	secured.DELETE("stores/:storeId/colors/:colorId", h.DeleteColor)
+	secured.POST("stores/:storeId/colors", h.AddColor)
+	secured.PATCH("stores/:storeId/colors/:colorId", h.UpdateColor)
+
+	
 	
 }

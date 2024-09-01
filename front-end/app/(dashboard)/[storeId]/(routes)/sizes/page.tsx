@@ -13,7 +13,6 @@ export default async function SizesPage({
     storeId: string;
   };
 }) {
-
   const {getToken} = auth()
   await setUpInterceptor(getToken)
 

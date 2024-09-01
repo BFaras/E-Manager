@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,9 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
-import { Color, Size } from "@prisma/client";
-import ImageUpload from "@/components/ui/image-upload";
+import { Color } from "@prisma/client";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -38,6 +39,7 @@ interface ColorFormProps {
 export default function ColorForm({ initialData }: ColorFormProps) {
   const params = useParams();
   const router = useRouter();
+  const {getToken} = useAuth();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,15 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const description = initialData ? "Edit color" : "Add a new color";
   const toastMessage = initialData ? "Color updated" : "Color created";
   const action = initialData ? "Save changes" : "Create color";
+
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
 
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
@@ -58,13 +69,10 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const onSubmit = async (data: ColorFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        await axios.patch(
-          `/api/${params.storeId}/colors/${params.colorId}`,
-          data
-        );
+      if (initialData) { 
+        await axiosInstance.patch(`secured/stores/${params.storeId}/colors/${params.colorId}`, data);
       } else {
-        await axios.post(`/api/${params.storeId}/colors`, data);
+        await axiosInstance.post(`secured/stores/${params.storeId}/colors`, data);
       }
       router.push(`/${params.storeId}/colors`);
       router.refresh();
@@ -79,12 +87,12 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`);
+      await axios.delete(`secured/stores/${params.storeId}/colors/${params.colorId}`);
       router.push(`/${params.storeId}/colors`);
       router.refresh();
       toast.success("Color deleted");
     } catch (error) {
-      toast.error("Make sure you removed all products using this colorfirst");
+      toast.error("Make sure you removed all products using this color first");
     } finally {
       setLoading(false);
       setOpen(false);

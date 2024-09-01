@@ -24,3 +24,37 @@ func (s *ColorService) GetColor(id string) (*entity.Color, error) {
     }
     return color, nil
 }
+
+func (s *ColorService) GetAllColors() ([]*entity.Color, error) {
+    colors, err := s.repository.FindAllColors()
+    if err != nil {
+        return nil, err
+    }
+    return colors, nil
+}
+
+func (s *ColorService) DeleteColor(id string) (error) {
+    err := s.repository.Delete(id)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (s *ColorService) UpdateColor(color *entity.Color) (error) {
+    err := s.repository.Update(color)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (s *ColorService) CreateColor(color *entity.Color) (error) {
+    err := s.repository.Create(color)
+    if err != nil {
+        return err
+    }
+    return  nil
+}
+
+

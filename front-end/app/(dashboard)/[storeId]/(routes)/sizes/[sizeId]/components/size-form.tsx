@@ -36,7 +36,7 @@ interface SizeFormProps {
 export default function SizeForm({ initialData }: SizeFormProps) {
   const params = useParams();
   const router = useRouter();
-  const {getToken} = useAuth();
+  const { getToken } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);

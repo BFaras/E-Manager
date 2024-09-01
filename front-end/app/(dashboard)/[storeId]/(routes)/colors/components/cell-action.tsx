@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { AlertModal } from "@/app/modals/alert-modal";
+import axiosInstance from "@/app/utils/axios_instance";
 
 interface CellActionProps {
   data: ColorColumn;
@@ -33,7 +34,7 @@ export default function CellAction({ data }: CellActionProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/colors/${data.id}`);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/colors/${data.id}`);
       router.refresh();
       toast.success("Color deleted");
     } catch (error) {
