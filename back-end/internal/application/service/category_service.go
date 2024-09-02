@@ -19,7 +19,7 @@ func NewCategoryService(database *sql.DB) *CategoryService {
 }
 
 func (s *CategoryService) GetCategory(id string) (*entity.Category, error) {
-    categories, err := s.repository.FindByID(id)
+    categories, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

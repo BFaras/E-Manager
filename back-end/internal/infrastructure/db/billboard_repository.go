@@ -16,7 +16,7 @@ func NewBillboardRepository(db *sql.DB) repository.BillboardRepository {
     return &BillboardRepository{db: db}
 }
 
-func (r *BillboardRepository) FindByID(id string) (*entity.Billboard, error) {
+func (r *BillboardRepository) FindById(id string) (*entity.Billboard, error) {
     billboard := &entity.Billboard{}
     query := `SELECT * FROM "public"."Billboard" WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(
@@ -30,10 +30,10 @@ func (r *BillboardRepository) FindByID(id string) (*entity.Billboard, error) {
     )
     
     if err != nil {
-        logger.Error("Error while fetching Billboard: ",zap.Error(err))
         if err == sql.ErrNoRows {
             return nil, nil
         }
+        logger.Error("Error while fetching Billboard: ",zap.Error(err))
         return nil, err
     }
 

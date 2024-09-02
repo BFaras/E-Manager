@@ -17,7 +17,7 @@ func NewCategoryRepository(db *sql.DB) repository.CategoryRepository {
     return &CategoryRepository{db: db}
 }
 
-func (r *CategoryRepository) FindByID(id string) (*entity.Category, error) {
+func (r *CategoryRepository) FindById(id string) (*entity.Category, error) {
     category := &entity.Category{}
     query := `SELECT * FROM "public"."Category" stores WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(&category.Id, &category.StoreId, &category.BillboardId,
@@ -47,8 +47,7 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto
         if err == sql.ErrNoRows {
             return nil, nil
         }
-        logger.Error("Error executing query:", zap.Error(err))
-
+        logger.Error("Error while fetching all categories:", zap.Error(err))
         return nil, err
     }
 

@@ -6,7 +6,7 @@ import (
 )
 
 type CategoryRepository interface {
-    FindByID(id string) (*entity.Category, error)
+    FindById(id string) (*entity.Category, error)
     Create(store *entity.Category) error
     Update(store *entity.Category) (error)
     Delete(id string) error

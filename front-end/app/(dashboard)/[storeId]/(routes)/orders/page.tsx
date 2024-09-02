@@ -1,9 +1,10 @@
 import React from "react";
-import prismaDB from "@/lib/prismadb";
 import { format } from "date-fns";
 import { formatter } from "@/lib/utils";
 import OrderClient from "./components/order-client";
 import { OrderColumn } from "./components/columns";
+import { auth } from "@clerk/nextjs/server";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 export default async function OrdersPage({
   params,
@@ -12,31 +13,21 @@ export default async function OrdersPage({
     storeId: string;
   };
 }) {
-  const orders = await prismaDB.order.findMany({
-    where: {
-      storeId: params.storeId,
-    },
-    include: {
-      orderItems: {
-        include: {
-          product: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const {getToken} = auth()
+  await setUpInterceptor(getToken)
+
+  const response = await axiosInstance.get(`stores/${params.storeId}/orders`)
+  const orders:any[] = response.data || []
 
   const formatedOrders: OrderColumn[] = orders.map((item) => ({
     id: item.id,
     phone: item.phone,
     address: item.address,
     products: item.orderItems
-      .map((orderItem) => orderItem.product.name)
+      .map((orderItem:any) => orderItem.product.name)
       .join(", "),
     totalPrice: formatter.format(
-      item.orderItems.reduce((total, item) => {
+      item.orderItems.reduce((total:string, item:any) => {
         return total + Number(item.product.price);
       }, 0)
     ),

@@ -3,8 +3,6 @@
 import Heading from "@/components/heading";
 import React from "react";
 import { Separator } from "@radix-ui/react-separator";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
 import { OrderColumn, columns } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
 
@@ -12,9 +10,6 @@ interface OrderClientProps {
   data: OrderColumn[];
 }
 export default function OrderClient({ data }: OrderClientProps) {
-  const router = useRouter();
-  const params = useParams();
-
   return (
     <>
       <Heading

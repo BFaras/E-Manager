@@ -18,7 +18,7 @@ func NewColorService(database *sql.DB) *ColorService {
 }
 
 func (s *ColorService) GetColor(id string) (*entity.Color, error) {
-    color, err := s.repository.FindByID(id)
+    color, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

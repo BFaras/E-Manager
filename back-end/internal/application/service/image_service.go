@@ -18,7 +18,7 @@ func NewImageService(database *sql.DB) *ImageService {
 }
 
 func (s *ImageService) GetImage(id string) (*entity.Image, error) {
-    color, err := s.repository.FindByID(id)
+    color, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

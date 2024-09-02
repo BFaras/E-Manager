@@ -18,7 +18,7 @@ func NewBilboardService(database *sql.DB) *BillboardService {
 }
 
 func (s *BillboardService) GetBillboard(id string) (*entity.Billboard, error) {
-    billboard, err := s.repository.FindByID(id)
+    billboard, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

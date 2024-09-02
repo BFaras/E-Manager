@@ -16,7 +16,7 @@ func NewColorRepository(db *sql.DB) repository.ColorRepository {
     return &ColorRepository{db: db}
 }
 
-func (r *ColorRepository) FindByID(id string) (*entity.Color ,error) {
+func (r *ColorRepository) FindById(id string) (*entity.Color ,error) {
     color := &entity.Color{}
     query := `SELECT * FROM "public"."Color" WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(&color.Id, &color.StoreId, &color.Name,&color.Value,

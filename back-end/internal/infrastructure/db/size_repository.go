@@ -16,7 +16,7 @@ func NewSizeRepository(db *sql.DB) repository.SizeRepository {
     return &SizeRepository{db: db}
 }
 
-func (r *SizeRepository) FindByID(id string) (*entity.Size ,error) {
+func (r *SizeRepository) FindById(id string) (*entity.Size ,error) {
     size:= &entity.Size{}
     query := `SELECT * FROM "public"."Size" stores WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(&size.Id, &size.StoreId,&size.Name ,&size.Value, &size.CreatedAt, &size.UpdatedAt)

@@ -19,7 +19,7 @@ func NewProductService(database *sql.DB) *ProductService {
 }
 
 func (s *ProductService) GetProduct(id string) (*entity.Product, error) {
-    product, err := s.repository.FindByID(id)
+    product, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

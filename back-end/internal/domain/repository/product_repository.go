@@ -6,7 +6,7 @@ import (
 )
 
 type ProductRepository interface {
-    FindByID(id string) (*entity.Product, error)
+    FindById(id string) (*entity.Product, error)
     Create(product *entity.Product) error
     Update(product *entity.Product) (error)
     Delete(id string) error

@@ -52,4 +52,6 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.POST("stores/:storeId/products", h.AddProduct)
 	secured.PATCH("stores/:storeId/products/:productId", h.UpdateProduct)
 
+	s.Echo.GET("stores/:storeId/orders", h.GetAllOrdersWithExtraInformationByStoreId)
+
 }

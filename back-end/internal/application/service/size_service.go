@@ -18,7 +18,7 @@ func NewSizeService(database *sql.DB) *SizeService {
 }
 
 func (s *SizeService) GetSize(id string) (*entity.Size, error) {
-    size, err := s.repository.FindByID(id)
+    size, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }

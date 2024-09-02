@@ -18,7 +18,7 @@ func NewOrderItemService(database *sql.DB) *OrderItemService {
 }
 
 func (s *OrderItemService) GetOrderItem(id string) (*entity.OrderItem, error) {
-    orderItem, err := s.repository.FindByID(id)
+    orderItem, err := s.repository.FindById(id)
     if err != nil {
         return nil, err
     }
