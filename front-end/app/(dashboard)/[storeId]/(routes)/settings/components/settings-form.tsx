@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { AlertModal } from "@/app/modals/alert-modal";
 import { ApiAlert } from "@/components/ui/api-alert";
 import { useOrigin } from "@/hooks/use-origin";
 import { Store } from "@prisma/client";
+import { useAuth } from "@clerk/nextjs";
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 interface SettingFormProps {
   initialData: Store;
@@ -31,6 +33,8 @@ export default function SettingForm({ initialData }: SettingFormProps) {
   const params = useParams();
   const router = useRouter();
   const origin = useOrigin();
+  const {getToken} = useAuth()
+
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,22 +44,33 @@ export default function SettingForm({ initialData }: SettingFormProps) {
     defaultValues: initialData,
   });
 
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
   const onSubmit = async (data: SettingFormValues) => {
     try {
       setLoading(true);
-      await axios.patch(`/api/stores/${params.storeId}`, data);
+      await axiosInstance.patch(`secured/stores/${params.storeId}`, data);
       router.refresh();
       setLoading(false);
       toast.success("store updated");
     } catch (error) {
       toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+      setOpen(false);
     }
   };
 
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/stores/${params.storeId}`);
+      await axiosInstance.delete(`secured/stores/${params.storeId}`);
       router.refresh();
       router.push("/");
       toast.success("Store deleted");

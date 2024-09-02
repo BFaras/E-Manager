@@ -1,3 +1,4 @@
+import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 import SettingForm from "./components/settings-form";
 import prismaDB from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
@@ -10,19 +11,17 @@ interface SettingPageProps {
   };
 }
 export default async function SettingsPage({ params }: SettingPageProps) {
-  const { userId } = auth();
+  const { userId, getToken } = auth();
 
   if (!userId) {
     redirect("/sign-in");
   }
 
-  const store = await prismaDB.store.findFirst({
-    where: {
-      id: params.storeId,
-      userId,
-    },
-  });
+  await setUpInterceptor(getToken);
 
+  const storeResponse = await axiosInstance.get(`users/${userId}/stores/${params.storeId}`);
+  const store = storeResponse.data
+  
   if (!store) {
     redirect("/");
   }

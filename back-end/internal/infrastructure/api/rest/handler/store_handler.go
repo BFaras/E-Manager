@@ -10,6 +10,10 @@ import (
     "database/sql"
 )
 
+type StoreRequest struct {
+    Name     string `json:"name"`   
+}
+
 func (h *Handler) GetAllStores(c echo.Context) error {
     logger.Debug("Fetching all stores...")
     store, err := h.storeService.GetAllStores()
@@ -61,8 +65,7 @@ func (h *Handler) GetStoreByIdAndUserId(c echo.Context) error {
 }
 
 func (h *Handler) DeleteStore(c echo.Context) (error) {
-	logger.Debug("Deleting billboard by id...")
-	billboardId := c.Param("billboardId")
+	logger.Debug("Deleting store by id...")
 	storeId := c.Param("storeId")
 	userID, ok := c.Get("userID").(string)
 	if !ok || userID == "" {
@@ -72,7 +75,7 @@ func (h *Handler) DeleteStore(c echo.Context) (error) {
 	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
         return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
     }
-	err := h.billboardService.DeleteBillboard(billboardId)
+	err := h.storeService.DeleteStore(storeId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -80,55 +83,49 @@ func (h *Handler) DeleteStore(c echo.Context) (error) {
 }
 
 func (h *Handler) AddStore(c echo.Context) error {
-    logger.Debug("Adding new billboard...")
+    logger.Debug("Adding new store...")
 
-    storeId := c.Param("storeId")
 	userID, ok := c.Get("userID").(string)
 	if !ok || userID == "" {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
-    var req CreateBillboardRequest
+
+    var req StoreRequest
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
 
-	if !h.storeService.IsOwnerOfStore(storeId, userID) { 
-        return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
-    }
-
-    billboard := &entity.Billboard{
+    store := &entity.Store{
         Id:        uuid.New().String(),
-        StoreId:   storeId,
-        Label:     req.Label,
-        ImageUrl:  req.ImageUrl,
+        Name:       req.Name,
+        UserId:   userID,
         CreatedAt: time.Now(),
         UpdatedAt: time.Now(),
-        IsActive:  req.IsActive,
     }
 
-    err := h.billboardService.CreateBillboard(billboard)
+    err := h.storeService.CreateStore(store)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
-    return c.NoContent(http.StatusOK)
+    return c.JSON(http.StatusCreated,store)
 }
 
 func (h *Handler) UpdateStore(c echo.Context) error {
-    logger.Debug("Updating billboard...")
+    logger.Debug("Updating store...")
 
-    billboardId := c.Param("billboardId")
+    storeId := c.Param("storeId")
     userID, ok := c.Get("userID").(string)
     if !ok || userID == "" {
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
 
-    var req UpdateBillboardRequest
+    var req StoreRequest
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
 
-    billboard, err := h.billboardService.GetBillboard(billboardId)
+    store, err := h.storeService.GetStore(storeId)
     if err != nil {
         if err == sql.ErrNoRows {
             return c.JSON(http.StatusNotFound, err.Error())
@@ -136,16 +133,14 @@ func (h *Handler) UpdateStore(c echo.Context) error {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
 
-    if !h.storeService.IsOwnerOfStore(billboard.StoreId, userID) { 
+    if !h.storeService.IsOwnerOfStore(store.Id, userID) { 
         return c.JSON(http.StatusForbidden, "You are not authorized to update this billboard")
     }
 
-    billboard.Label = req.Label
-    billboard.ImageUrl = req.ImageUrl
-    billboard.UpdatedAt = time.Now()
-    billboard.IsActive = req.IsActive
+    store.Name = req.Name
+    store.UpdatedAt = time.Now()
 
-    if err := h.billboardService.UpdateBillboard(billboard); err != nil {
+    if err := h.storeService.UpdateStore(store); err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
 

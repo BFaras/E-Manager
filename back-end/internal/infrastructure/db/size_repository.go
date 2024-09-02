@@ -30,10 +30,10 @@ func (r *SizeRepository) FindById(id string) (*entity.Size ,error) {
     return size, nil
 }
 
-func (r *SizeRepository) FindAllSizes() ([]*entity.Size, error) {
+func (r *SizeRepository) FindAllSizes(storeId string) ([]*entity.Size, error) {
     var sizes []*entity.Size
-    query := `SELECT * FROM "public"."Size"`
-    rows, err := r.db.Query(query)
+    query := `SELECT * FROM "public"."Size" WHERE "storeId" = $1;`
+    rows, err := r.db.Query(query, storeId)
     if err != nil {
         logger.Error("Error while fetching all Sizes : ", zap.Error(err))
         return nil, err

@@ -7,5 +7,5 @@ type ColorRepository interface {
     Create(store *entity.Color) error
     Update(store *entity.Color) (error)
     Delete(id string) error
-    FindAllColors() ([]*entity.Color, error)
+    FindAllColors(storeId string) ([]*entity.Color, error)
 }

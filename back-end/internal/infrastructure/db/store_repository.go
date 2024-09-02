@@ -95,21 +95,59 @@ func (r *storeRepository) IsOwnerOfStore(id string, userId string) (bool) {
     `
     err := r.db.QueryRow(query, id, userId).Scan(&count)
     if err != nil {
-        logger.Error("Error : ", zap.Error(err))
+        logger.Error("Error while checking ownership of store: ", zap.Error(err))
         return false
     }
     return count > 0
 }
 
 func (r *storeRepository) Create(store *entity.Store) error {
-    return nil
+    query := `
+    INSERT INTO "public"."Store" ("id","name","userId","createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5)
+    `
+    _, err := r.db.Exec(query, store.Id, store.Name, store.UserId, store.CreatedAt, store.UpdatedAt)
+    if err != nil {
+        logger.Error("Error : ",zap.Error(err))
+        return err
+}
+
+return nil
 }
 
 func (r *storeRepository) Update(store *entity.Store) (error) {
-    return nil
+    query := `
+    UPDATE "public"."Store"
+    SET "name" = $1, "userId" = $2, "createdAt" = $3, "updatedAt" = $4
+    WHERE "id" = $5
+    `
+    _, err := r.db.Exec(query, store.Name, store.UserId, store.CreatedAt, store.UpdatedAt, store.Id)
+    if err != nil {
+        logger.Error("Error while updating store : ", zap.Error(err))
+        return err
+}
+
+return nil
 }
 
 func (r *storeRepository) Delete(id string) error {
+    query := `DELETE FROM "public"."Store" WHERE id = $1;`
+    result, err := r.db.Exec(query, id)
+    if err != nil {
+        logger.Error("Error while deleting store : ",zap.Error(err))
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        logger.Error("Error : ",zap.Error(err))
+        return err
+    }
+
+    if rowsAffected == 0 {
+        logger.Error("No row has been affected : ",zap.String("storeId",id))
+    }
+
     return nil
 }
 

@@ -25,8 +25,8 @@ func (s *SizeService) GetSize(id string) (*entity.Size, error) {
     return size, nil
 }
 
-func (s *SizeService) GetAllSizes() ([]*entity.Size, error) {
-    size, err := s.repository.FindAllSizes()
+func (s *SizeService) GetAllSizes(storeId string) ([]*entity.Size, error) {
+    size, err := s.repository.FindAllSizes(storeId)
     if err != nil {
         return nil, err
     }

@@ -7,5 +7,5 @@ type SizeRepository interface {
     Create(size *entity.Size) (error)
     Update(size *entity.Size) (error)
     Delete(id string) error
-    FindAllSizes() ([]*entity.Size, error)
+    FindAllSizes(storeId string) ([]*entity.Size, error)
 }

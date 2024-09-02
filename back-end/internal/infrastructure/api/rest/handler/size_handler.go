@@ -28,7 +28,8 @@ func (h* Handler) GetSizeById(c echo.Context) (error) {
 
 func (h *Handler) GetAllSizes(c echo.Context) error {
     logger.Debug("Fetch sizes with billboard by storeId...")
-    sizes, err := h.sizeService.GetAllSizes()
+    storeId := c.Param("storeId")
+    sizes, err := h.sizeService.GetAllSizes(storeId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, zap.Error(err))
     }

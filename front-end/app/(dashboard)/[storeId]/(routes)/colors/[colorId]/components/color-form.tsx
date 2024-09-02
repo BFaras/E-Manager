@@ -87,7 +87,7 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const onDelette = async () => {
     try {
       setLoading(true);
-      await axios.delete(`secured/stores/${params.storeId}/colors/${params.colorId}`);
+      await axiosInstance.delete(`secured/stores/${params.storeId}/colors/${params.colorId}`);
       router.push(`/${params.storeId}/colors`);
       router.refresh();
       toast.success("Color deleted");

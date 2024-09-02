@@ -25,8 +25,8 @@ func (s *ColorService) GetColor(id string) (*entity.Color, error) {
     return color, nil
 }
 
-func (s *ColorService) GetAllColors() ([]*entity.Color, error) {
-    colors, err := s.repository.FindAllColors()
+func (s *ColorService) GetAllColors(storeId string) ([]*entity.Color, error) {
+    colors, err := s.repository.FindAllColors(storeId)
     if err != nil {
         return nil, err
     }

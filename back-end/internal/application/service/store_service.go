@@ -64,15 +64,27 @@ func (s *StoreService) IsOwnerOfStore(id string, userId string) (bool) {
 }
 
 func (s *StoreService) CreateStore(store *entity.Store) error {
-    return nil
+    err := s.repository.Create(store)
+    if err != nil {
+        return err
+    }
+    return  nil
 }
 
 func (s *StoreService) UpdateStore(store *entity.Store) (error) {
+    err := s.repository.Update(store)
+    if err != nil {
+        return err
+    }
     return nil
 }
 
 func (s *StoreService) DeleteStore(id string) error {
-    return nil
+    err := s.repository.Delete(id)
+    if err != nil {
+        return err
+    }
+    return  nil
 }
 
 

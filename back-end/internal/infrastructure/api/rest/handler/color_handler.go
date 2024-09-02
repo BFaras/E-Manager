@@ -28,7 +28,8 @@ func (h* Handler) GetColorById(c echo.Context) (error) {
 
 func (h *Handler) GetAllColors(c echo.Context) error {
     logger.Debug("Fetch All colors...")
-    colors, err := h.colorService.GetAllColors()
+    storeId := c.Param("storeId")
+    colors, err := h.colorService.GetAllColors(storeId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, zap.Error(err))
     }

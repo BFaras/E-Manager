@@ -13,17 +13,20 @@ import { Input } from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 import { useStoreModal } from "@/hooks/use-store-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
+import axiosInstance, { setUpInterceptor } from "../utils/axios_instance";
 
 const formSchema = z.object({
   name: z.string().min(1),
 });
 
 export function StoreModal() {
+  const {getToken} = useAuth()
   const storeModal = useStoreModal();
 
   const [loading, setLoading] = useState(false);
@@ -35,15 +38,23 @@ export function StoreModal() {
     },
   });
 
+  const setup = async () => {
+    await setUpInterceptor(getToken);
+  };
+
+  useEffect(() => {
+    setup();
+  }, [getToken]);
+
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-
-      const response = await axios.post("/api/stores", values);
+      const response = await axiosInstance.post('secured/stores',values)
 
       window.location.assign(`/${response.data.id}`);
     } catch (error) {
-      toast.error("something went wrontg");
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

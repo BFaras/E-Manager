@@ -52,10 +52,11 @@ func (r *ColorRepository) Delete(id string) error {
     return nil
 }
 
-func (r *ColorRepository) FindAllColors() ([]*entity.Color, error) {
+func (r *ColorRepository) FindAllColors(storeId string) ([]*entity.Color, error) {
     var sizes []*entity.Color
-    query := `SELECT * FROM "public"."Color"`
-    rows, err := r.db.Query(query)
+    query := `SELECT * FROM "public"."Color" 
+    WHERE "storeId" = $1;`
+    rows, err := r.db.Query(query,storeId)
     if err != nil {
         logger.Error("Error while fetching all Colors : ", zap.Error(err))
         return nil, err
