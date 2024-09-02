@@ -106,8 +106,7 @@ export default function CategoryForm({
       router.refresh();
       toast.success("Category deleted");
     } catch (error) {
-      console.log("help")
-      console.log(error)
+    
       toast.error("Make sure you removed all products using this category");
     } finally {
       setLoading(false);

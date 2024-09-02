@@ -14,8 +14,6 @@ export default async function ProductPage({
 
   const responseProducts = await axiosInstance.get(`stores/${params.storeId}/products/${params.productId}/image`)
   const product = responseProducts.data;
-  console.log("help")
-  console.log(product)
 
   const responseCategories = await axiosInstance.get(`stores/${params.storeId}/categories`)
   const categories = responseCategories.data ;
