@@ -76,6 +76,8 @@ func (h *Handler) AddProduct(c echo.Context) error {
         ColorId:    req.ColorId,
         CreatedAt:  time.Now(),
         UpdatedAt:  time.Now(),
+        Count: req.Count,
+        IsDeleted: false,
     }
 
     err := h.productService.CreateProduct(product)

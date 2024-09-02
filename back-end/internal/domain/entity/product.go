@@ -14,4 +14,6 @@ type Product struct {
     ColorId    string    `json:"colorId"`
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
+    Count  int `json:"count"`
+    IsDeleted  bool `json:"isDeleted"`
 }

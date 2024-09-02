@@ -19,4 +19,6 @@ type ProductWithExtraInfoDTO struct {
     Size       *entity.Size    `json:"size"`
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
+    Count  int `json:"count"`
+    IsDeleted  bool `json:"isDeleted"`
 }

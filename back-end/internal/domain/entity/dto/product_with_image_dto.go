@@ -17,4 +17,6 @@ type ProductWithImageDTO struct {
     Images   []*entity.Image    `json:"images"`
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
+    Count  int `json:"count"`
+    IsDeleted  bool `json:"isDeleted"`
 }

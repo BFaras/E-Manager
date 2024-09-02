@@ -64,13 +64,17 @@ func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId
         err := rows.Scan(
             &product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
             &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId, &product.CreatedAt, &product.UpdatedAt,
+            &product.Count,&product.IsDeleted,
             &product.Color.Id, &product.Color.StoreId, &product.Color.Name, &product.Color.Value, &product.Color.CreatedAt, &product.Color.UpdatedAt,
             &product.Size.Id, &product.Size.StoreId, &product.Size.Name, &product.Size.Value, &product.Size.CreatedAt, &product.Size.UpdatedAt,
             &product.Category.Id, &product.Category.StoreId, &product.Category.BillboardId, &product.Category.Name, &product.Category.CreatedAt, &product.Category.UpdatedAt,
         )
         if err != nil {
-            logger.Error("Error while Scanning all Products: ", zap.Error(err))
+            logger.Error("Error while Scanning all Products With Extra Information: ", zap.Error(err))
             return nil, err
+        }
+        if (product.IsDeleted) {
+            continue
         }
         products = append(products, product)
     }
@@ -129,11 +133,11 @@ func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.Produc
 func (r *productRepository) Create(product *entity.Product) error {
     query := `
         INSERT INTO "public"."Product" ("id", "storeId", "categoryId","name","price","isFeatured","isArchived","sizeId",
-        "colorId","createdAt", "updatedAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        "colorId","createdAt", "updatedAt","count", "isDeleted")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     `
     _, err := r.db.Exec(query,product.Id, product.StoreId,  product.CategoryId,product.Name,product.Price,
-        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt)
+        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Count,product.IsDeleted)
     if err != nil {
         logger.Error("Error : ",zap.Error(err))
         return err
@@ -146,11 +150,11 @@ func (r *productRepository) Update(product *entity.Product) (error) {
     query := `
     UPDATE "public"."Product"
     SET "storeId" = $1, "categoryId" = $2, "name" = $3, "price" = $4, "isFeatured" = $5, "isArchived" = $6 ,"sizeId" = $7,
-    "colorId" = $8 ,"createdAt" = $9 , "updatedAt" = $10
-    WHERE "id" = $11
+    "colorId" = $8 ,"createdAt" = $9 , "updatedAt" = $10, "count" = $11, "isDeleted" = $ 12
+    WHERE "id" = $13
     `
     _, err := r.db.Exec(query, product.StoreId, product.CategoryId,product.Name,product.Price,
-        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Id)
+        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Count,product.IsDeleted, product.Id)
     if err != nil {
         logger.Error("Error: ", zap.Error(err))
         return err
@@ -160,7 +164,9 @@ func (r *productRepository) Update(product *entity.Product) (error) {
 }
 
 func (r *productRepository) Delete(id string) error {
-    query := `DELETE FROM "public"."Product" WHERE id = $1;`
+    query := `Update "public"."Product"
+    SET "isDeleted" = true
+    WHERE "id" = $1`
     result, err := r.db.Exec(query, id)
     if err != nil {
         logger.Error("Error while deleting product : ",zap.Error(err))
