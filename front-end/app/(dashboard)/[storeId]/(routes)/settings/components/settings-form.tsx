@@ -1,19 +1,19 @@
 "use client";
 import React, { useState } from "react";
-import Heading from "./heading";
+import Heading from "@/components/heading";
 import * as z from "zod";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { Separator } from "./ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
-import { Input } from "./ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
-import { ApiAlert } from "./ui/api-alert";
+import { ApiAlert } from "@/components/ui/api-alert";
 import { useOrigin } from "@/hooks/use-origin";
 import { Store } from "@prisma/client";
 
