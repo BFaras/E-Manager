@@ -22,7 +22,7 @@ func (r *productRepository) FindById(id string) (*entity.Product ,error) {
     product := &entity.Product{}
     query := `SELECT * FROM "public"."Product" WHERE id = $1;`
     err := r.db.QueryRow(query, id).Scan(&product.Id, &product.StoreId,  &product.CategoryId,&product.Name,&product.Price,
-        &product.IsFeatured,&product.IsArchived,&product.SizeId,&product.ColorId,  &product.CreatedAt, &product.UpdatedAt)
+        &product.IsFeatured,&product.IsArchived,&product.SizeId,&product.ColorId,  &product.CreatedAt, &product.UpdatedAt,&product.Count,&product.IsDeleted,)
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, nil
@@ -107,7 +107,7 @@ func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.Produc
         hasRows = true 
         var image entity.Image
         err := rows.Scan(&product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
-            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId, &product.CreatedAt, &product.UpdatedAt,
+            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId, &product.CreatedAt, &product.UpdatedAt, &product.Count, &product.IsDeleted,
             &image.Id, &image.ProductId, &image.URL, &image.CreatedAt, &image.UpdatedAt)
 
         if err != nil {
@@ -130,7 +130,7 @@ func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.Produc
     return product, nil
 }
 
-func (r *productRepository) Create(product *entity.Product) error {
+func (r *productRepository) Create(product *dto.ProductWithImageDTO) error {
     query := `
         INSERT INTO "public"."Product" ("id", "storeId", "categoryId","name","price","isFeatured","isArchived","sizeId",
         "colorId","createdAt", "updatedAt","count", "isDeleted")
@@ -139,7 +139,7 @@ func (r *productRepository) Create(product *entity.Product) error {
     _, err := r.db.Exec(query,product.Id, product.StoreId,  product.CategoryId,product.Name,product.Price,
         product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Count,product.IsDeleted)
     if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        logger.Error("Error while creating a product: ",zap.Error(err))
         return err
     }
 

@@ -7,7 +7,7 @@ import (
 
 type ProductRepository interface {
     FindById(id string) (*entity.Product, error)
-    Create(product *entity.Product) error
+    Create(product *dto.ProductWithImageDTO) error
     Update(product *entity.Product) (error)
     Delete(id string) error
     FindAllProductsWithExtraInformationByStoreId(storeId string) ([]*dto.ProductWithExtraInfoDTO, error)

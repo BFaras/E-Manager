@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"back-end/internal/domain/entity"
 	"back-end/internal/infrastructure/logger"
 	"database/sql"
 	"net/http"
@@ -38,7 +37,6 @@ func (h *Handler) GetAllProductsWithImageById(c echo.Context) error {
     logger.Debug("Fetch products with image by storeId...")
     productId := c.Param("productId")
     product, err := h.productService.GetAllProductsWithImageById(productId)
-    logger.Debug("here is what it founds", zap.Reflect("product",product))
     if err != nil {
         logger.Error("Error while trying to get all Products with images")
         return c.JSON(http.StatusInternalServerError, zap.Error(err))
@@ -55,7 +53,7 @@ func (h *Handler) AddProduct(c echo.Context) error {
         logger.Error("User ID missing or invalid")
         return c.JSON(http.StatusUnauthorized, "Unauthorized")
     }
-    var req *entity.Product
+    var req *dto.ProductWithImageDTO
     if err := c.Bind(&req); err != nil {
         return c.JSON(http.StatusBadRequest, err.Error())
     }
@@ -64,7 +62,7 @@ func (h *Handler) AddProduct(c echo.Context) error {
         return c.JSON(http.StatusForbidden, "You are not authorized to add this product")
     }
 
-    product := &entity.Product{
+    product := &dto.ProductWithImageDTO{
         Id:         uuid.New().String(),
         StoreId:    storeId,
         CategoryId: req.CategoryId,
@@ -78,6 +76,7 @@ func (h *Handler) AddProduct(c echo.Context) error {
         UpdatedAt:  time.Now(),
         Count: req.Count,
         IsDeleted: false,
+        Images:    req.Images,
     }
 
     err := h.productService.CreateProduct(product)
