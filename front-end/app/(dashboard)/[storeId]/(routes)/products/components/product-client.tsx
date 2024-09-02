@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { ProductColumn, columns } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
-import ApiList from "@/components/ui/api-list";
 
 interface ProductClientProps {
   data: ProductColumn[];
@@ -31,9 +30,6 @@ export default function ProductClient({ data }: ProductClientProps) {
       </div>
       <Separator></Separator>
       <DataTable columns={columns} data={data} searchKey="name"></DataTable>
-      <Heading title="API" description="API calls for Products"></Heading>
-      <Separator></Separator>
-      <ApiList entityName="products" entityIdName="productId"></ApiList>
     </>
   );
 }
