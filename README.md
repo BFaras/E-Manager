@@ -1,6 +1,5 @@
 *THIS IS A BUSINESS IDEA AND FOR THAT REASON, THE COMPLEMENTORY PROJECT (E-COMMERCE) DOESN'T HAVE THE COMPLETED VERSION ON GITHUB AND .ENV FILE IS HIDDEN. 
 I HAVE ONLY PUT E-MANAGER IN DISPLAY TO SHOWCASE MY CODING SKILLS.STILL, I WILL PROVIDE SOME PICTURES OF OF HOW E-COMMERCE LOOKS LIKE" 
-This repository is designed to work in conjunction with the E-Commerce project: https://github.com/BFaras/E-Commerce. It provides a powerful CMS that enhances your experience in managing your e-commerce platform. It fixes a problem that I see Shopify has which ishave a CMS for each shop, which makes it harder to handle multiple stores at the same time.
 
 Project Overview
 This project allows users to create multiple stores, add products, and manage store-related operations. Each store can have multiple products, but before adding a product, a billboard, category, and size must be created. Once a product is added, it becomes available for purchase in the store, and the dashboard is updated to provide analytics for the user, including total revenue and sales metrics.
