@@ -11,6 +11,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured := s.Echo.Group("secured/")
     secured.Use(m.JWTMiddleware)
 
+	/*CMS Manager*/
    	s.Echo.GET("users/:userId/store", h.GetStoreByUserId)
 	s.Echo.GET("users/:userId/stores", h.GetStoresByUserId)
 	s.Echo.GET("users/:userId/stores/:storeId",  h.GetStoreByIdAndUserId)
@@ -57,5 +58,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.PATCH("stores/:storeId/products/:productId", h.UpdateProduct)
 
 	s.Echo.GET("stores/:storeId/orders", h.GetAllOrdersWithExtraInformationByStoreId)
+
+	/*Store*/
 
 }
