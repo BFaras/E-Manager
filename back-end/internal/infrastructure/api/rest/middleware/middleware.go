@@ -64,7 +64,7 @@ func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			logger.Error("Token cclaims not valid ",zap.Error(err))
+			logger.Error("Token claims not valid ",zap.Error(err))
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
 		}
 

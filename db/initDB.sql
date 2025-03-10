@@ -1,9 +1,8 @@
 CREATE SCHEMA IF NOT EXISTS public;
 
-
 -- CreateTable: Store
 CREATE TABLE public."Store" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
     "name" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -12,10 +11,11 @@ CREATE TABLE public."Store" (
 
 -- CreateTable: Billboard
 CREATE TABLE public."Billboard" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
     "label" TEXT NOT NULL,
     "imageUrl" TEXT NOT NULL,
+    "isActive" BOOLEAN DEFAULT false NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT "Billboard_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES public."Store"("id") ON DELETE CASCADE
@@ -23,9 +23,9 @@ CREATE TABLE public."Billboard" (
 
 -- CreateTable: Category
 CREATE TABLE public."Category" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
-    "billboardId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
+    "billboardId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE public."Category" (
 
 -- CreateTable: Size
 CREATE TABLE public."Size" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "value" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -46,8 +46,8 @@ CREATE TABLE public."Size" (
 
 -- CreateTable: Color
 CREATE TABLE public."Color" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "value" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -57,15 +57,17 @@ CREATE TABLE public."Color" (
 
 -- CreateTable: Product
 CREATE TABLE public."Product" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
-    "categoryId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
+    "categoryId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "price" DECIMAL(10,2) NOT NULL,
+    "count" INTEGER DEFAULT 0 NOT NULL,
     "isFeatured" BOOLEAN DEFAULT false NOT NULL,
     "isArchived" BOOLEAN DEFAULT false NOT NULL,
-    "sizeId" UUID NOT NULL,
-    "colorId" UUID NOT NULL,
+    "isDeleted" BOOLEAN DEFAULT false NOT NULL,
+    "sizeId" TEXT NOT NULL,
+    "colorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT "Product_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES public."Store"("id") ON DELETE CASCADE,
@@ -76,8 +78,8 @@ CREATE TABLE public."Product" (
 
 -- CreateTable: Image
 CREATE TABLE public."Image" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "productId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "productId" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -86,8 +88,8 @@ CREATE TABLE public."Image" (
 
 -- CreateTable: Order
 CREATE TABLE public."Order" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "storeId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "storeId" TEXT NOT NULL,
     "isPaid" BOOLEAN DEFAULT false NOT NULL,
     "phone" TEXT NOT NULL DEFAULT '',
     "address" TEXT NOT NULL DEFAULT '',
@@ -98,9 +100,9 @@ CREATE TABLE public."Order" (
 
 -- CreateTable: OrderItem
 CREATE TABLE public."OrderItem" (
-    "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    "orderId" UUID NOT NULL,
-    "productId" UUID NOT NULL,
+    "id" TEXT DEFAULT gen_random_uuid()::TEXT PRIMARY KEY,
+    "orderId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
     CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES public."Order"("id") ON DELETE CASCADE,
     CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES public."Product"("id") ON DELETE CASCADE
 );

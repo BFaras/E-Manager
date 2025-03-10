@@ -146,17 +146,21 @@ func (r *productRepository) Create(product *dto.ProductWithImageDTO) error {
     return nil
 }
 
-func (r *productRepository) Update(product *entity.Product) (error) {
+func (r *productRepository) Update(product *entity.Product) error {
     query := `
     UPDATE "public"."Product"
-    SET "storeId" = $1, "categoryId" = $2, "name" = $3, "price" = $4, "isFeatured" = $5, "isArchived" = $6 ,"sizeId" = $7,
-    "colorId" = $8 ,"createdAt" = $9 , "updatedAt" = $10, "count" = $11, "isDeleted" = $ 12
-    WHERE "id" = $13
+    SET "storeId" = $1, "categoryId" = $2, "name" = $3, "price" = $4, 
+        "isFeatured" = $5, "isArchived" = $6, "sizeId" = $7, "colorId" = $8,
+        "count" = $9, "isDeleted" = $10, "updatedAt" = $11
+    WHERE "id" = $12
     `
-    _, err := r.db.Exec(query, product.StoreId, product.CategoryId,product.Name,product.Price,
-        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Count,product.IsDeleted, product.Id)
+    _, err := r.db.Exec(query, 
+        product.StoreId, product.CategoryId, product.Name, product.Price,
+        product.IsFeatured, product.IsArchived, product.SizeId, product.ColorId, 
+        product.Count, product.IsDeleted, product.UpdatedAt, product.Id)
+
     if err != nil {
-        logger.Error("Error: ", zap.Error(err))
+        logger.Error("Error updating product: ", zap.Error(err))
         return err
     }
 

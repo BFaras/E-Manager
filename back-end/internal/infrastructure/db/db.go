@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"os"
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
 )
 
 
@@ -34,17 +33,6 @@ func SetUpDatabase() (*sql.DB, error) {
     }
 
     logger.Info("Successfully connected to the database")
-
-    var variable string
-    err = db.QueryRow(`SELECT id FROM "public"."Billboard"`).Scan(&variable)
-    if err != nil {
-        logger.Error("Failed to perform the query to the database: ", zap.Error(err))
-        db.Close()
-        return nil, err
-    }
-
-    logger.Info("Successfully performed the query", zap.String("result", variable))
-    logger.Debug(variable)
 
     return db, nil
 }

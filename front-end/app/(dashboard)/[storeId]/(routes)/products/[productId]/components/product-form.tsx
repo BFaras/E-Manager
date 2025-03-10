@@ -167,7 +167,7 @@ export default function ProductForm({
                 <FormLabel>Images</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    value={field.value.map((image) => image.url)}
+                    value={field.value?.map((image) => image.url)}
                     disabled={loading}
                     onChange={(url) =>
                       field.onChange([...field.value, { url }])
@@ -237,7 +237,7 @@ export default function ProductForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
                         </SelectItem>
@@ -268,7 +268,7 @@ export default function ProductForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {sizes.map((size) => (
+                      {sizes?.map((size) => (
                         <SelectItem key={size.id} value={size.id}>
                           {size.name}
                         </SelectItem>
@@ -299,7 +299,7 @@ export default function ProductForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {colors.map((color) => (
+                      {colors?.map((color) => (
                         <SelectItem key={color.id} value={color.id}>
                           {color.name}
                         </SelectItem>
