@@ -37,11 +37,13 @@ const formSchema = z.object({
   name: z.string().min(1),
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
+  count: z.coerce.number().min(1),
   categoryId: z.string().min(1),
   colorId: z.string().min(1),
   sizeId: z.string().min(1),
   isFeatured: z.boolean().default(false).optional(),
   isArchived: z.boolean().default(false).optional(),
+  isDeleted: z.boolean().default(false).optional(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -80,12 +82,14 @@ export default function ProductForm({
       : {
           name: "",
           images: [],
+          count: 0,
           price: 0,
           categoryId: "",
           colorId: "",
           sizeId: "",
           isFeatured: false,
           isArchived: false,
+          isDeleted:false
         },
   });
 
@@ -193,6 +197,23 @@ export default function ProductForm({
                     <Input
                       disabled={loading}
                       placeholder="Product label"
+                      {...field}
+                    ></Input>
+                  </FormControl>
+                </FormItem>
+              )}
+            ></FormField>
+              <FormField
+              control={form.control}
+              name="count"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Count</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={loading}
+                      placeholder="5"
                       {...field}
                     ></Input>
                   </FormControl>
@@ -346,6 +367,27 @@ export default function ProductForm({
                     <FormLabel>Archived</FormLabel>
                     <FormDescription>
                       This will not appear anywhere on the store
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            ></FormField>
+                        <FormField
+              control={form.control}
+              name="isDeleted"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormLabel>isDeleted</FormLabel>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    ></Checkbox>
+                  </FormControl>
+                  <div className="space-y-2 leading-none">
+                    <FormLabel>Deleted</FormLabel>
+                    <FormDescription>
+                      This will soft the delete the product
                     </FormDescription>
                   </div>
                 </FormItem>
