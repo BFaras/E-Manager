@@ -16,12 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
 import { Color } from "@prisma/client";
-import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
-import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -39,7 +36,6 @@ interface ColorFormProps {
 export default function ColorForm({ initialData }: ColorFormProps) {
   const params = useParams();
   const router = useRouter();
-  const {getToken} = useAuth();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,15 +44,6 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const description = initialData ? "Edit color" : "Add a new color";
   const toastMessage = initialData ? "Color updated" : "Color created";
   const action = initialData ? "Save changes" : "Create color";
-
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
 
   const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
@@ -69,11 +56,20 @@ export default function ColorForm({ initialData }: ColorFormProps) {
   const onSubmit = async (data: ColorFormValues) => {
     try {
       setLoading(true);
-      if (initialData) { 
-        await axiosInstance.patch(`secured/stores/${params.storeId}/colors/${params.colorId}`, data);
-      } else {
-        await axiosInstance.post(`secured/stores/${params.storeId}/colors`, data);
-      }
+      const url = initialData
+        ? `/api/proxy?path=secured/stores/${params.storeId}/colors/${params.colorId}`
+        : `/api/proxy?path=secured/stores/${params.storeId}/colors`;
+
+      const method = initialData ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Failed to save color");
+
       router.push(`/${params.storeId}/colors`);
       router.refresh();
       toast.success(toastMessage);
@@ -84,10 +80,16 @@ export default function ColorForm({ initialData }: ColorFormProps) {
     }
   };
 
-  const onDelette = async () => {
+  // ✅ Delete request using `/api/proxy`
+  const onDelete = async () => {
     try {
       setLoading(true);
-      await axiosInstance.delete(`secured/stores/${params.storeId}/colors/${params.colorId}`);
+      const url = `/api/proxy?path=secured/stores/${params.storeId}/colors/${params.colorId}`;
+
+      const res = await fetch(url, { method: "DELETE" });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
       router.push(`/${params.storeId}/colors`);
       router.refresh();
       toast.success("Color deleted");
@@ -98,32 +100,26 @@ export default function ColorForm({ initialData }: ColorFormProps) {
       setOpen(false);
     }
   };
+
   return (
     <>
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onDelette}
+        onConfirm={onDelete}
         loading={loading}
-      ></AlertModal>
+      />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
         {initialData && (
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4"></Trash>
+          <Button variant="destructive" size="icon" onClick={() => setOpen(true)}>
+            <Trash className="h-4 w-4" />
           </Button>
         )}
       </div>
-      <Separator></Separator>
+      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full "
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -132,37 +128,26 @@ export default function ColorForm({ initialData }: ColorFormProps) {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Color name"
-                      {...field}
-                    ></Input>
+                    <Input disabled={loading} placeholder="Color name" {...field} />
                   </FormControl>
                 </FormItem>
               )}
-            ></FormField>
+            />
             <FormField
               control={form.control}
               name="value"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Color Value</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-x-4">
-                      <Input
-                        disabled={loading}
-                        placeholder="Color value"
-                        {...field}
-                      ></Input>
-                      <div
-                        className="border p-4 rounded-full"
-                        style={{ backgroundColor: field.value }}
-                      />
+                      <Input disabled={loading} placeholder="Color value" {...field} />
+                      <div className="border p-4 rounded-full" style={{ backgroundColor: field.value }} />
                     </div>
                   </FormControl>
                 </FormItem>
               )}
-            ></FormField>
+            />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

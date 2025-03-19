@@ -13,22 +13,17 @@ import { Input } from "@/components/ui/input";
 import Modal from "@/components/ui/modal";
 import { useStoreModal } from "@/hooks/use-store-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useAuth } from "@clerk/nextjs";
-import axiosInstance, { setUpInterceptor } from "../utils/axios_instance";
 
 const formSchema = z.object({
   name: z.string().min(1),
 });
 
 export function StoreModal() {
-  const {getToken} = useAuth()
   const storeModal = useStoreModal();
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -38,21 +33,19 @@ export function StoreModal() {
     },
   });
 
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.post('secured/stores',values)
+      const response = await fetch("/api/proxy?path=secured/stores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-      window.location.assign(`/${response.data.id}`);
+      if (!response.ok) throw new Error("Failed to create store");
+
+      const data = await response.json();
+      window.location.assign(`/${data.id}`);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -82,13 +75,13 @@ export function StoreModal() {
                         disabled={loading}
                         placeholder="E-Commerce"
                         {...field}
-                      ></Input>
+                      />
                     </FormControl>
-                    <FormMessage></FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
-              ></FormField>
-              <div className="pt-6 space-x-2 flex items-center justify-end ">
+              />
+              <div className="pt-6 space-x-2 flex items-center justify-end">
                 <Button
                   disabled={loading}
                   variant="outline"

@@ -24,9 +24,9 @@ func (r *BillboardRepository) FindById(id string) (*entity.Billboard, error) {
         &billboard.StoreId,
         &billboard.Label,
         &billboard.ImageUrl,
+        &billboard.IsActive,  
         &billboard.CreatedAt,
         &billboard.UpdatedAt,
-        &billboard.IsActive,
     )
     
     if err != nil {
@@ -60,7 +60,15 @@ func (r *BillboardRepository) FindBillboardsByStoreId(storeId string) ([]*entity
 	var billboards []*entity.Billboard
 	for rows.Next() {
 		b := &entity.Billboard{}
-		err := rows.Scan(&b.Id, &b.StoreId,&b.Label,&b.ImageUrl,&b.CreatedAt,&b.UpdatedAt,&b.IsActive)
+		err := rows.Scan(
+            &b.Id,
+            &b.StoreId,
+            &b.Label,
+            &b.ImageUrl,
+            &b.IsActive,  
+            &b.CreatedAt,
+            &b.UpdatedAt,
+        )
 		if err != nil {
             logger.Error("Error : ",zap.Error(err))
 			return nil, err
@@ -84,8 +92,15 @@ func (r *BillboardRepository) FindActiveBillboard(storeId string) (*entity.Billb
 	FROM "public"."Billboard"
 	WHERE "storeId" = $1 AND "isActive" = true
 	`
-	err := r.db.QueryRow(query, storeId).Scan(&billboard.Id, &billboard.StoreId, &billboard.Label,&billboard.ImageUrl,
-        &billboard.CreatedAt, &billboard.UpdatedAt,&billboard.IsActive)
+	err := r.db.QueryRow(query, storeId).Scan(
+        &billboard.Id,
+        &billboard.StoreId,
+        &billboard.Label,
+        &billboard.ImageUrl,
+        &billboard.IsActive, 
+        &billboard.CreatedAt,
+        &billboard.UpdatedAt,
+    )
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, nil
@@ -120,27 +135,42 @@ func (r *BillboardRepository) Delete(id string) error {
 
 func (r *BillboardRepository) Create(billboard *entity.Billboard) error {
     query := `
-        INSERT INTO "public"."Billboard" ("id", "storeId", "label", "imageUrl", "createdAt", "updatedAt", "isActive")
+        INSERT INTO "public"."Billboard" ("id", "storeId", "label", "imageUrl", "isActive", "createdAt", "updatedAt")
         VALUES ($1, $2, $3, $4, $5, $6, $7)
     `
-    _, err := r.db.Exec(query, billboard.Id, billboard.StoreId, billboard.Label, billboard.ImageUrl, billboard.CreatedAt, billboard.UpdatedAt, billboard.IsActive)
+    _, err := r.db.Exec(query, 
+        billboard.Id, 
+        billboard.StoreId, 
+        billboard.Label, 
+        billboard.ImageUrl, 
+        billboard.IsActive,   
+        billboard.CreatedAt, 
+        billboard.UpdatedAt,
+    )
     if err != nil {
-        logger.Error("Error : ",zap.Error(err))
+        logger.Error("Error : ", zap.Error(err))
         return err
     }
 
     return nil
 }
 
-
-func (r *BillboardRepository) Update(billboard *entity.Billboard) (error) {
+func (r *BillboardRepository) Update(billboard *entity.Billboard) error {
     query := `
         UPDATE "public"."Billboard"
-        SET "storeId" = $1, "label" = $2, "imageUrl" = $3, "createdAt" = $4, "updatedAt" = $5, "isActive" = $6
+        SET "storeId" = $1, "label" = $2, "imageUrl" = $3, "isActive" = $4, "createdAt" = $5, "updatedAt" = $6
         WHERE "id" = $7
     `
 
-    _, err := r.db.Exec(query, billboard.StoreId, billboard.Label, billboard.ImageUrl, billboard.CreatedAt, billboard.UpdatedAt, billboard.IsActive, billboard.Id)
+    _, err := r.db.Exec(query, 
+        billboard.StoreId, 
+        billboard.Label, 
+        billboard.ImageUrl, 
+        billboard.IsActive,   
+        billboard.CreatedAt, 
+        billboard.UpdatedAt, 
+        billboard.Id,
+    )
     if err != nil {
         logger.Error("Error: ", zap.Error(err))
         return err

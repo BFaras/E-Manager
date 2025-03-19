@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Heading from "@/components/heading";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,6 @@ import { AlertModal } from "@/app/modals/alert-modal";
 import { Billboard } from "@prisma/client";
 import ImageUpload from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
-import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
-import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   label: z.string().min(1),
@@ -40,7 +38,6 @@ interface BillboardFormProps {
 export default function BillboardForm({ initialData }: BillboardFormProps) {
   const params = useParams();
   const router = useRouter();
-  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -59,76 +56,69 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     },
   });
 
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
+  // ✅ Use `/api/proxy` instead of axiosInstance
   const onSubmit = async (data: BillboardFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        console.log("doing a patch...")
-        await axiosInstance.patch(`secured/stores/${params.storeId}/billboards/${params.billboardId}`,data)
-      } else {
-        await axiosInstance.post(`secured/stores/${params.storeId}/billboards`,data)
-      }
+      const url = initialData
+        ? `/api/proxy?path=secured/stores/${params.storeId}/billboards/${params.billboardId}`
+        : `/api/proxy?path=secured/stores/${params.storeId}/billboards`;
+
+      const method = initialData ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Failed to save billboard");
+
       router.push(`/${params.storeId}/billboards`);
       router.refresh();
       toast.success(toastMessage);
     } catch (error) {
-      console.log(error);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  const onDelette = async () => {
+  // ✅ Delete request using `/api/proxy`
+  const onDelete = async () => {
     try {
       setLoading(true);
-      await axiosInstance.delete(
-        `secured/stores/${params.storeId}/billboards/${params.billboardId}`
-      );
+      const url = `/api/proxy?path=secured/stores/${params.storeId}/billboards/${params.billboardId}`;
+
+      const res = await fetch(url, { method: "DELETE" });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
       router.push(`/${params.storeId}/billboards`);
       router.refresh();
       toast.success("Billboard deleted");
     } catch (error) {
-      toast.error("Make sure you removed all categories using billboard");
+      toast.error("Make sure you removed all categories using this billboard");
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
+
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelette}
-        loading={loading}
-      ></AlertModal>
+      <AlertModal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
         {initialData && (
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4"></Trash>
+          <Button variant="destructive" size="icon" onClick={() => setOpen(true)}>
+            <Trash className="h-4 w-4" />
           </Button>
         )}
       </div>
-      <Separator></Separator>
+      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full "
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <FormField
             control={form.control}
             name="imageUrl"
@@ -141,11 +131,11 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                     disabled={loading}
                     onChange={(url) => field.onChange(url)}
                     onRemove={() => field.onChange("")}
-                  ></ImageUpload>
+                  />
                 </FormControl>
               </FormItem>
             )}
-          ></FormField>
+          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -154,15 +144,11 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Billboard label"
-                      {...field}
-                    ></Input>
+                    <Input disabled={loading} placeholder="Billboard label" {...field} />
                   </FormControl>
                 </FormItem>
               )}
-            ></FormField>
+            />
             <FormField
               control={form.control}
               name="isActive"
@@ -170,10 +156,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormLabel>isActive</FormLabel>
                   <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    ></Checkbox>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-2 leading-none">
                     <FormLabel>Active</FormLabel>
@@ -183,7 +166,7 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                   </div>
                 </FormItem>
               )}
-            ></FormField>
+            />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

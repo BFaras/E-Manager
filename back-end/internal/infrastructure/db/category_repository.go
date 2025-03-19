@@ -34,7 +34,9 @@ func (r *CategoryRepository) FindById(id string) (*entity.Category, error) {
 
 func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto.CategoryWithBillboardDTO,error) {
 
-    query := `SELECT *
+    query := `SELECT 
+    c."id", c."storeId", c."billboardId", c."name", c."createdAt", c."updatedAt",
+    b."id", b."storeId", b."label", b."imageUrl", b."isActive", b."createdAt", b."updatedAt"
     FROM "public"."Category" c
     LEFT JOIN "public"."Billboard" b
     ON c."billboardId" = b."id"
@@ -70,9 +72,9 @@ func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto
             &billboard.StoreId,
             &billboard.Label,
             &billboard.ImageUrl,
+            &billboard.IsActive, 
             &billboard.CreatedAt,
             &billboard.UpdatedAt,
-            &billboard.IsActive,
         )
         
         if err != nil {

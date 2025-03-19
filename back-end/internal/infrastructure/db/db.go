@@ -9,7 +9,7 @@ import (
 
 
 func loadEnvValue(prefix string) (string, error) {
-    err := godotenv.Load("../../.bin/.env")
+    err := godotenv.Load("/app/.bin/.env")
     if err != nil {
         return "", err
     }

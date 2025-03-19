@@ -25,7 +25,7 @@ func NewJWTService(envKey string) (*JWTService, error) {
 }
 
 func loadRSAPublicKeyFromEnv(envKey string) (*rsa.PublicKey, error) {
-	if err := godotenv.Load("../../.bin/.env"); err != nil {
+	if err := godotenv.Load("/app/.bin/.env"); err != nil {
 		return nil, fmt.Errorf("failed to load .env file: %w", err)
 	}
 

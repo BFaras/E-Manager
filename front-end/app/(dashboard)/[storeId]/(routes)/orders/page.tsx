@@ -19,8 +19,6 @@ export default async function OrdersPage({
   const response = await axiosInstance.get(`stores/${params.storeId}/orders`)
   const orders:any[] = response.data || []
 
-  /*the filter here is because OrderItem_producId_fk deleted cascade, but order might still have orderItems 
-  TODO: when deleting product I need to delete orderId */
   const formatedOrders: OrderColumn[] = orders.filter((item) => item.orderItems !== null).map((item) => ({
     id: item.id,
     phone: item.phone,

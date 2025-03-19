@@ -24,6 +24,7 @@ func (m *Middleware) CORSConfig() echo.MiddlewareFunc {
 		AllowOrigins: []string{
 			"http://localhost:3000",
             "http://localhost:3001",
+			"*",
 		},
 		AllowMethods: []string{
 			echo.GET,

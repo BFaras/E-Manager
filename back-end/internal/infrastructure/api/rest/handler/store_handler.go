@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"back-end/internal/domain/entity"
 	"back-end/internal/infrastructure/logger"
+	"database/sql"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-    "back-end/internal/domain/entity"
-    "time"
-    "github.com/google/uuid"
-    "database/sql"
+	"go.uber.org/zap"
 )
 
 type StoreRequest struct {
@@ -107,6 +109,8 @@ func (h *Handler) AddStore(c echo.Context) error {
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
+
+    logger.Debug("New store added:", zap.Any("store",store))
 
     return c.JSON(http.StatusCreated,store)
 }

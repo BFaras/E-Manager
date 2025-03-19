@@ -10,14 +10,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
 import { ApiAlert } from "@/components/ui/api-alert";
 import { useOrigin } from "@/hooks/use-origin";
 import { Store } from "@prisma/client";
-import { useAuth } from "@clerk/nextjs";
-import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 
 interface SettingFormProps {
   initialData: Store;
@@ -33,8 +30,6 @@ export default function SettingForm({ initialData }: SettingFormProps) {
   const params = useParams();
   const router = useRouter();
   const origin = useOrigin();
-  const {getToken} = useAuth()
-
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,35 +39,37 @@ export default function SettingForm({ initialData }: SettingFormProps) {
     defaultValues: initialData,
   });
 
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
   const onSubmit = async (data: SettingFormValues) => {
     try {
       setLoading(true);
-      await axiosInstance.patch(`secured/stores/${params.storeId}`, data);
+      const url = `/api/proxy?path=secured/stores/${params.storeId}`;
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Failed to update store");
+
       router.refresh();
-      setLoading(false);
-      toast.success("store updated");
+      toast.success("Store updated");
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
-      setOpen(false);
     }
   };
 
-  const onDelette = async () => {
+  const onDelete = async () => {
     try {
       setLoading(true);
-      await axiosInstance.delete(`secured/stores/${params.storeId}`);
-      router.refresh();
+      const url = `/api/proxy?path=secured/stores/${params.storeId}`;
+      const res = await fetch(url, { method: "DELETE" });
+
+      if (!res.ok) throw new Error("Failed to delete store");
+
       router.push("/");
+      router.refresh();
       toast.success("Store deleted");
     } catch (error) {
       toast.error("Make sure you removed all the products first");
@@ -81,26 +78,19 @@ export default function SettingForm({ initialData }: SettingFormProps) {
       setOpen(false);
     }
   };
+
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelette}
-        loading={loading}
-      ></AlertModal>
+      <AlertModal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
       <div className="flex items-center justify-between">
         <Heading title="Settings" description="Manage store preference" />
         <Button variant="destructive" size="icon" onClick={() => setOpen(true)}>
-          <Trash className="h-4 w-4"></Trash>
+          <Trash className="h-4 w-4" />
         </Button>
       </div>
-      <Separator></Separator>
+      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full "
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -109,27 +99,19 @@ export default function SettingForm({ initialData }: SettingFormProps) {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Store name"
-                      {...field}
-                    ></Input>
+                    <Input disabled={loading} placeholder="Store name" {...field} />
                   </FormControl>
                 </FormItem>
               )}
-            ></FormField>
+            />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             Save Changes
           </Button>
         </form>
       </Form>
-      <Separator></Separator>
-      <ApiAlert
-        title="NEXT_PUBLIC_API_URL"
-        description={`${origin}/api/${params.storeId}`}
-        variant="public"
-      ></ApiAlert>
+      <Separator />
+      <ApiAlert title="NEXT_PUBLIC_API_URL" description={`${origin}/api/${params.storeId}`} variant="public" />
     </>
   );
 }

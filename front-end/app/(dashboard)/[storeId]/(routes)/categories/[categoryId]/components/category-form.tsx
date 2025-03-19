@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useParams, useRouter } from "next/navigation";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { AlertModal } from "@/app/modals/alert-modal";
 import { Billboard, Category } from "@prisma/client";
@@ -27,8 +26,6 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
-import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
-import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -48,7 +45,6 @@ export default function CategoryForm({
 }: CategoryFormProps) {
   const params = useParams();
   const router = useRouter();
-  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,26 +62,22 @@ export default function CategoryForm({
     },
   });
 
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
-
   const onSubmit = async (data: CategoryFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        await axiosInstance.patch(
-          `secured/stores/${params.storeId}/categories/${params.categoryId}`,
-          data
-        );
-      } else {
-        await axiosInstance.post(`secured/stores/${params.storeId}/categories`, data);
-      }
+      const url = initialData
+        ? `/api/proxy?path=secured/stores/${params.storeId}/categories/${params.categoryId}`
+        : `/api/proxy?path=secured/stores/${params.storeId}/categories`;
+      const method = initialData ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Failed to save category");
+
       router.push(`/${params.storeId}/categories`);
       router.refresh();
       toast.success(toastMessage);
@@ -96,49 +88,39 @@ export default function CategoryForm({
     }
   };
 
-  const onDelette = async () => {
+  const onDelete = async () => {
     try {
       setLoading(true);
-      await axiosInstance.delete(
-        `secured/stores/${params.storeId}/categories/${params.categoryId}`
-      );
+      const url = `/api/proxy?path=secured/stores/${params.storeId}/categories/${params.categoryId}`;
+      const res = await fetch(url, { method: "DELETE" });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
       router.push(`/${params.storeId}/categories`);
       router.refresh();
       toast.success("Category deleted");
     } catch (error) {
-    
       toast.error("Make sure you removed all products using this category");
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
+
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelette}
-        loading={loading}
-      ></AlertModal>
+      <AlertModal isOpen={open} onClose={() => setOpen(false)} onConfirm={onDelete} loading={loading} />
       <div className="flex items-center justify-between">
         <Heading title={title} description={description} />
         {initialData && (
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4"></Trash>
+          <Button variant="destructive" size="icon" onClick={() => setOpen(true)}>
+            <Trash className="h-4 w-4" />
           </Button>
         )}
       </div>
-      <Separator></Separator>
+      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full "
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
@@ -147,15 +129,11 @@ export default function CategoryForm({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Category name"
-                      {...field}
-                    ></Input>
+                    <Input disabled={loading} placeholder="Category name" {...field} />
                   </FormControl>
                 </FormItem>
               )}
-            ></FormField>
+            />
 
             <FormField
               control={form.control}
@@ -171,10 +149,7 @@ export default function CategoryForm({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a billboard"
-                        ></SelectValue>
+                        <SelectValue defaultValue={field.value} placeholder="Select a billboard" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -187,7 +162,7 @@ export default function CategoryForm({
                   </Select>
                 </FormItem>
               )}
-            ></FormField>
+            />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}

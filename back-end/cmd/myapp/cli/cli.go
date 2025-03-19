@@ -30,6 +30,6 @@ func Execute() error {
 
 func init() {
    cmd.PersistentFlags().StringVarP(
-      &config, "config", "c", "../../.bin/config.dev.yaml",
+      &config, "config", "c", "/app/.bin/config.dev.yaml",
    "path to file")
 }

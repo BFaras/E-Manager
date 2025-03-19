@@ -93,25 +93,22 @@ export default function ProductForm({
         },
   });
 
-  const setup = async () => {
-    await setUpInterceptor(getToken);
-  };
-
-  useEffect(() => {
-    setup();
-  }, [getToken]);
-
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        await axiosInstance.patch(
-          `secured/stores/${params.storeId}/products/${params.productId}`,
-          data
-        );
-      } else {
-        await axiosInstance.post(`secured/stores/${params.storeId}/products`, data);
-      }
+      const url = initialData
+        ? `/api/proxy?path=secured/stores/${params.storeId}/products/${params.productId}`
+        : `/api/proxy?path=secured/stores/${params.storeId}/products`;
+      const method = initialData ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error("Failed to save product");
+
       router.push(`/${params.storeId}/products`);
       router.refresh();
       toast.success(toastMessage);
@@ -122,10 +119,14 @@ export default function ProductForm({
     }
   };
 
-  const onDelette = async () => {
+  const onDelete = async () => {
     try {
       setLoading(true);
-      await axiosInstance.delete(`secured/stores/${params.storeId}/products/${params.productId}`);
+      const url = `/api/proxy?path=secured/stores/${params.storeId}/products/${params.productId}`;
+      const res = await fetch(url, { method: "DELETE" });
+
+      if (!res.ok) throw new Error("Failed to delete");
+
       router.push(`/${params.storeId}/products`);
       router.refresh();
       toast.success("Product deleted");
@@ -142,7 +143,7 @@ export default function ProductForm({
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onDelette}
+        onConfirm={onDelete}
         loading={loading}
       ></AlertModal>
       <div className="flex items-center justify-between">

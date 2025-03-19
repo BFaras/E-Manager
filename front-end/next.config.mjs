@@ -3,7 +3,9 @@ const nextConfig = {
     images:{
         domains: [
             "res.cloudinary.com",
-            "localhost:3000"
+            "localhost:3000",
+            "*"
+            
         ]
     }
 };

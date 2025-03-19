@@ -1,5 +1,5 @@
 # Use official Golang image
-FROM golang:1.20-alpine
+FROM golang:1.21-alpine
 
 # Set working directory
 WORKDIR /app
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8080
 
 # Run the Go app in development mode
-CMD ["go", "run", "./cmd/main.go", "http-server"]
+CMD ["go", "run", "./cmd/myapp/main.go", "http-server"]
