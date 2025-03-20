@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"back-end/internal/application/service"
-	"back-end/internal/infrastructure/logger"
 	"net/http"
 	"strings"
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"time"
+	"github.com/MicahParks/keyfunc"
 	"go.uber.org/zap"
 )
 
@@ -42,49 +42,76 @@ func (m *Middleware) CORSConfig() echo.MiddlewareFunc {
 }
 
 func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	jwksURL := "https://fast-barnacle-55.clerk.accounts.dev/.well-known/jwks.json" // replace with your Clerk JWKS URL
+
+	options := keyfunc.Options{
+		RefreshInterval: time.Hour,
+		RefreshErrorHandler: func(err error) {
+			zap.L().Error("Error refreshing JWKS", zap.Error(err))
+		},
+		RefreshTimeout: 30 * time.Second,
+	}
+
+	jwks, err := keyfunc.Get(jwksURL, options)
+	if err != nil {
+		zap.L().Fatal("Failed to get JWKS from Clerk", zap.Error(err))
+	}
+
 	return func(c echo.Context) error {
+		// Extract the token from the Authorization header.
 		tokenString := c.Request().Header.Get("Authorization")
+		zap.L().Debug("Received Authorization Header", zap.String("Authorization", tokenString))
 		if tokenString == "" {
-			logger.Error("Error no Token", zap.String("token", tokenString))
+			zap.L().Error("No token found in request headers")
 			return echo.NewHTTPError(http.StatusUnauthorized, "Missing token")
 		}
 
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		zap.L().Debug("Extracted Token", zap.String("token", tokenString))
 
-		JWTService, err := service.NewJWTService("PUBLIC_KEY")
-		if err != nil {
-			logger.Error("Error loading public key", zap.Error(err))
-			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token service")
-		}
-
-		token, err := JWTService.VerifyToken(tokenString)
+		token, err := jwt.Parse(tokenString, jwks.Keyfunc)
 		if err != nil || !token.Valid {
-			logger.Error("Token verification failed", zap.Error(err))
-			
-			// **Check if the error is due to expiration**
+			zap.L().Error("Token verification failed", zap.Error(err))
+			if err != nil {
+				zap.L().Debug("Token error details", zap.Any("error", err))
+			}
 			var ve *jwt.ValidationError
-			if errors.As(err, &ve) && ve.Errors == jwt.ValidationErrorExpired {
-				logger.Error("Token has expired", zap.Error(err))
+			if errors.As(err, &ve) && ve.Errors&jwt.ValidationErrorExpired != 0 {
+				zap.L().Error("Token has expired", zap.Error(err))
 				return echo.NewHTTPError(http.StatusUnauthorized, "Token expired")
 			}
-
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			logger.Error("Invalid token claims", zap.Error(err))
+			zap.L().Error("Failed to extract token claims")
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
 		}
 
+
+		zap.L().Debug("Token Claims", zap.Any("claims", claims))
+		if exp, ok := claims["exp"].(float64); ok {
+			currentTime := float64(time.Now().Unix())
+			zap.L().Debug("Token expiration", zap.Float64("exp", exp), zap.Float64("currentTime", currentTime))
+			zap.L().Debug("Time until expiration", zap.Float64("secondsLeft", exp-currentTime))
+		}
+		if iat, ok := claims["iat"].(float64); ok {
+			zap.L().Debug("Token issued at", zap.Float64("iat", iat))
+		}
+		if nbf, ok := claims["nbf"].(float64); ok {
+			zap.L().Debug("Token not valid before", zap.Float64("nbf", nbf))
+		}
+
+
 		userID, ok := claims["sub"].(string)
 		if !ok {
-			logger.Debug("Error extracting userId", zap.String("userId", userID))
+			zap.L().Error("User ID not found in token", zap.Any("claims", claims))
 			return echo.NewHTTPError(http.StatusUnauthorized, "User ID not found in token")
 		}
 
 		c.Set("userID", userID)
-		logger.Debug("User ID extracted", zap.String("userId", userID))
+		zap.L().Debug("User ID successfully extracted", zap.String("userId", userID))
 
 		return next(c)
 	}

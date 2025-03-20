@@ -6,9 +6,11 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
-
+	"go.uber.org/zap"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
+	"back-end/internal/infrastructure/logger"
+
 )
 
 type JWTService struct {
@@ -53,11 +55,24 @@ func loadRSAPublicKeyFromEnv(envKey string) (*rsa.PublicKey, error) {
 }
 
 func (s *JWTService) VerifyToken(tokenString string) (*jwt.Token, error) {
+	logger.Debug("Verifying JWT token", zap.String("token", tokenString))
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			logger.Error("Unexpected signing method", zap.String("alg", fmt.Sprintf("%v", token.Header["alg"])))
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
+		logger.Debug("Token signature method validated")
+
 		return s.publicKey, nil
 	})
+
+	if err != nil {
+		logger.Error("JWT parsing failed", zap.Error(err))
+	} else {
+		logger.Debug("JWT successfully parsed")
+	}
+
 	return token, err
 }

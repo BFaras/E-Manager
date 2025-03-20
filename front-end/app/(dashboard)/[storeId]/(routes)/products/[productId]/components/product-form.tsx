@@ -66,7 +66,6 @@ export default function ProductForm({
 }: ProductFormProps) {
   const params = useParams();
   const router = useRouter();
-  const {getToken} = useAuth()
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
