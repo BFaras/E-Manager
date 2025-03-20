@@ -18,25 +18,37 @@ func NewProductRepository(db *sql.DB) repository.ProductRepository {
     return &productRepository{db: db}
 }
 
-func (r *productRepository) FindById(id string) (*entity.Product ,error) {
+func (r *productRepository) FindById(id string) (*entity.Product, error) {
     product := &entity.Product{}
-    query := `SELECT * FROM "public"."Product" WHERE id = $1;`
-    err := r.db.QueryRow(query, id).Scan(&product.Id, &product.StoreId,  &product.CategoryId,&product.Name,&product.Price,
-        &product.IsFeatured,&product.IsArchived,&product.SizeId,&product.ColorId,  &product.CreatedAt, &product.UpdatedAt,&product.Count,&product.IsDeleted,)
+    query := `SELECT "id", "storeId", "categoryId", "name", "price", "isFeatured",
+                     "isArchived", "sizeId", "colorId", "createdAt", "updatedAt", "count", "isDeleted"
+              FROM "public"."Product" WHERE "id" = $1;`
+
+    err := r.db.QueryRow(query, id).Scan(
+        &product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
+        &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId,
+        &product.CreatedAt, &product.UpdatedAt, &product.Count, &product.IsDeleted,
+    )
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, nil
         }
-        logger.Error("Error while fetching Product : ", zap.Error(err))
+        logger.Error("Error while fetching Product: ", zap.Error(err))
         return nil, err
     }
     return product, nil
 }
 
+
 func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId string) ([]*dto.ProductWithExtraInfoDTO, error) {
     var products []*dto.ProductWithExtraInfoDTO
     query := `SELECT 
-        product.*, color.* , size.*, category.*
+        product."id", product."storeId", product."categoryId", product."name", product."price",
+        product."isFeatured", product."isArchived", product."sizeId", product."colorId", 
+        product."createdAt", product."updatedAt", product."count", product."isDeleted",
+        color."id", color."storeId", color."name", color."value", color."createdAt", color."updatedAt",
+        size."id", size."storeId", size."name", size."value", size."createdAt", size."updatedAt",
+        category."id", category."storeId", category."billboardId", category."name", category."createdAt", category."updatedAt"
         FROM "public"."Product" product
         LEFT JOIN "public"."Color" color ON product."colorId" = color."id"
         LEFT JOIN "public"."Size" size ON product."sizeId" = size."id"
@@ -44,36 +56,36 @@ func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId
         WHERE product."storeId" = $1
         ORDER BY product."createdAt" DESC`
 
-    rows, err := r.db.Query(query,storeId);
+    rows, err := r.db.Query(query, storeId)
     if err != nil {
         if err == sql.ErrNoRows {
             return nil, nil
         }
-        logger.Error("Error while fetching Products with extra Info : ", zap.Error(err))
+        logger.Error("Error while fetching Products with extra Info: ", zap.Error(err))
         return nil, err
     }
     defer rows.Close()
 
     for rows.Next() {
         product := &dto.ProductWithExtraInfoDTO{
-            Color: &entity.Color{},
-            Size: &entity.Size{},
+            Color:    &entity.Color{},
+            Size:     &entity.Size{},
             Category: &entity.Category{},
         }
-    
+
         err := rows.Scan(
             &product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
-            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId, &product.CreatedAt, &product.UpdatedAt,
-            &product.Count,&product.IsDeleted,
+            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId,
+            &product.CreatedAt, &product.UpdatedAt, &product.Count, &product.IsDeleted,
             &product.Color.Id, &product.Color.StoreId, &product.Color.Name, &product.Color.Value, &product.Color.CreatedAt, &product.Color.UpdatedAt,
             &product.Size.Id, &product.Size.StoreId, &product.Size.Name, &product.Size.Value, &product.Size.CreatedAt, &product.Size.UpdatedAt,
             &product.Category.Id, &product.Category.StoreId, &product.Category.BillboardId, &product.Category.Name, &product.Category.CreatedAt, &product.Category.UpdatedAt,
         )
         if err != nil {
-            logger.Error("Error while Scanning all Products With Extra Information: ", zap.Error(err))
+            logger.Error("Error while scanning all Products With Extra Information: ", zap.Error(err))
             return nil, err
         }
-        if (product.IsDeleted) {
+        if product.IsDeleted {
             continue
         }
         products = append(products, product)
@@ -81,12 +93,16 @@ func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId
     return products, nil
 }
 
+
 func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.ProductWithImageDTO, error) {
-    query := `SELECT product.*, image.*
-              FROM "public"."Product" product
-              LEFT JOIN "public"."Image" image
-              ON product."id" = image."productId"
-              WHERE product."id" = $1;`
+    query := `SELECT 
+        product."id", product."storeId", product."categoryId", product."name", product."price",
+        product."isFeatured", product."isArchived", product."sizeId", product."colorId",
+        product."createdAt", product."updatedAt", product."count", product."isDeleted",
+        image."id", image."productId", image."url", image."createdAt", image."updatedAt"
+        FROM "public"."Product" product
+        LEFT JOIN "public"."Image" image ON product."id" = image."productId"
+        WHERE product."id" = $1;`
 
     rows, err := r.db.Query(query, id)
     if err != nil {
@@ -104,11 +120,14 @@ func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.Produc
 
     hasRows := false
     for rows.Next() {
-        hasRows = true 
+        hasRows = true
         var image entity.Image
-        err := rows.Scan(&product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
-            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId, &product.CreatedAt, &product.UpdatedAt, &product.Count, &product.IsDeleted,
-            &image.Id, &image.ProductId, &image.URL, &image.CreatedAt, &image.UpdatedAt)
+        err := rows.Scan(
+            &product.Id, &product.StoreId, &product.CategoryId, &product.Name, &product.Price,
+            &product.IsFeatured, &product.IsArchived, &product.SizeId, &product.ColorId,
+            &product.CreatedAt, &product.UpdatedAt, &product.Count, &product.IsDeleted,
+            &image.Id, &image.ProductId, &image.URL, &image.CreatedAt, &image.UpdatedAt,
+        )
 
         if err != nil {
             logger.Error("Error while scanning rows: ", zap.String("id", id), zap.Error(err))
@@ -130,14 +149,18 @@ func (r *productRepository) FindAllProductsWithImageById(id string) (*dto.Produc
     return product, nil
 }
 
+
 func (r *productRepository) Create(product *dto.ProductWithImageDTO) error {
     query := `
-        INSERT INTO "public"."Product" ("id", "storeId", "categoryId","name","price","isFeatured","isArchived","sizeId",
-        "colorId","createdAt", "updatedAt","count", "isDeleted")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    `
-    _, err := r.db.Exec(query,product.Id, product.StoreId,  product.CategoryId,product.Name,product.Price,
-        product.IsFeatured,product.IsArchived,product.SizeId,product.ColorId, product.CreatedAt, product.UpdatedAt,product.Count,product.IsDeleted)
+    INSERT INTO "public"."Product" 
+    ("id", "storeId", "categoryId", "name", "price", "count", "isFeatured", "isArchived", "isDeleted", "sizeId",
+    "colorId", "createdAt", "updatedAt")
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+`
+_, err := r.db.Exec(query,
+    product.Id, product.StoreId, product.CategoryId, product.Name, product.Price, 
+    product.Count, product.IsFeatured, product.IsArchived, product.IsDeleted,
+    product.SizeId, product.ColorId, product.CreatedAt, product.UpdatedAt)
     if err != nil {
         logger.Error("Error while creating a product: ",zap.Error(err))
         return err

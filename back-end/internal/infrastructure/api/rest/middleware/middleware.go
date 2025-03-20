@@ -5,7 +5,7 @@ import (
 	"back-end/internal/infrastructure/logger"
 	"net/http"
 	"strings"
-
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -45,33 +45,41 @@ func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
-			logger.Error("Error no Token ",zap.String("token",tokenString))
+			logger.Error("Error no Token", zap.String("token", tokenString))
 			return echo.NewHTTPError(http.StatusUnauthorized, "Missing token")
 		}
 
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 
-        JWTService, err := service.NewJWTService("PUBLIC_KEY")
-        if err != nil  {
-			logger.Error("Error public key ",zap.Error(err))
-			return echo.NewHTTPError(http.StatusUnauthorized, err)
+		JWTService, err := service.NewJWTService("PUBLIC_KEY")
+		if err != nil {
+			logger.Error("Error loading public key", zap.Error(err))
+			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token service")
 		}
 
 		token, err := JWTService.VerifyToken(tokenString)
 		if err != nil || !token.Valid {
-			logger.Error("Token not valid ",zap.Error(err))
+			logger.Error("Token verification failed", zap.Error(err))
+			
+			// **Check if the error is due to expiration**
+			var ve *jwt.ValidationError
+			if errors.As(err, &ve) && ve.Errors == jwt.ValidationErrorExpired {
+				logger.Error("Token has expired", zap.Error(err))
+				return echo.NewHTTPError(http.StatusUnauthorized, "Token expired")
+			}
+
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			logger.Error("Token claims not valid ",zap.Error(err))
+			logger.Error("Invalid token claims", zap.Error(err))
 			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token claims")
 		}
 
 		userID, ok := claims["sub"].(string)
 		if !ok {
-			logger.Debug("Error by userId ",zap.String("userId",userID))
+			logger.Debug("Error extracting userId", zap.String("userId", userID))
 			return echo.NewHTTPError(http.StatusUnauthorized, "User ID not found in token")
 		}
 
