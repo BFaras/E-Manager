@@ -17,8 +17,10 @@ type ProductWithExtraInfoDTO struct {
     Category   *entity.Category    `json:"category"`
     Color      *entity.Color    `json:"color"`
     Size       *entity.Size    `json:"size"`
+    Images   []*entity.Image    `json:"images"`
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
     Count  int `json:"count"`
     IsDeleted  bool `json:"isDeleted"`
+    
 }

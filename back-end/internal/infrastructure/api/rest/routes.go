@@ -22,7 +22,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	s.Echo.GET("stores/:storeId/graphRevenue",  h.GetGraphRevenue)
 	s.Echo.GET("stores/:storeId/billboards",  h.GetBillboardsByStoreId)
 	s.Echo.GET("stores/:storeId/billboards/active", h.GetActiveBillboardForSpecificStore)
-	s.Echo.GET("billboards/:billboardId", h.GetBillboardById)
+	s.Echo.GET("stores/:storeId/billboards/:billboardId", h.GetBillboardById)
 
 	secured.DELETE("stores/:storeId", h.DeleteStore)
 	secured.PATCH("stores/:storeId", h.UpdateStore)

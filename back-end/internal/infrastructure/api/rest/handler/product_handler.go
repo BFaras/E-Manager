@@ -25,9 +25,22 @@ func (h* Handler) GetProductById(c echo.Context) (error) {
 func (h *Handler) GetAllProductsWithExtraInformationByStoreId(c echo.Context) error {
     logger.Debug("Fetch products with extra category, size and colors by storeId...")
     storeId := c.Param("storeId")
-    products, err := h.productService.GetAllProductsWithExtraInformationByStoreId(storeId)
+
+    colorId := c.QueryParam("colorId")
+    sizeId := c.QueryParam("sizeId")
+    categoryId := c.QueryParam("categoryId")
+    isFeatured := c.QueryParam("isFeatured")
+
+    filter := dto.ProductFilterDTO{
+        ColorId:    colorId,
+        SizeId:     sizeId,
+        CategoryId: categoryId,
+        IsFeatured: isFeatured,
+    }
+
+    products, err := h.productService.GetAllProductsWithExtraInformationByStoreId(storeId, filter)
     if err != nil {
-        logger.Error("Error while trying to get all Products with extra info")
+        logger.Error("Error while trying to get all Products with extra info", zap.Error(err))
         return c.JSON(http.StatusInternalServerError, zap.Error(err))
     }
     return c.JSON(http.StatusOK, products)

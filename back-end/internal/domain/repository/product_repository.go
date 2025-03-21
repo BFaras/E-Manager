@@ -10,6 +10,6 @@ type ProductRepository interface {
     Create(product *dto.ProductWithImageDTO) error
     Update(product *entity.Product) (error)
     Delete(id string) error
-    FindAllProductsWithExtraInformationByStoreId(storeId string) ([]*dto.ProductWithExtraInfoDTO, error)
+    FindAllProductsWithExtraInformationByStoreId(storeId string,filter dto.ProductFilterDTO) ([]*dto.ProductWithExtraInfoDTO, error)
     FindAllProductsWithImageById(id string) (*dto.ProductWithImageDTO, error)
 }
