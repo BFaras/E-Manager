@@ -50,7 +50,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.POST("stores/:storeId/colors", h.AddColor)
 	secured.PATCH("stores/:storeId/colors/:colorId", h.UpdateColor)
 
-	s.Echo.GET("stores/:storeId/products/:productId", h.GetProductById)
+	s.Echo.GET("stores/:storeId/products/:productId", h.GetProductWithExtraInfoById)
 	s.Echo.GET("stores/:storeId/products", h.GetAllProductsWithExtraInformationByStoreId)
 	s.Echo.GET("stores/:storeId/products/:productId/image", h.GetAllProductsWithImageById)
 	secured.DELETE("stores/:storeId/products/:productId", h.DeleteProduct)

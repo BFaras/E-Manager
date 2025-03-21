@@ -40,6 +40,139 @@ func (r *productRepository) FindById(id string) (*entity.Product, error) {
     return product, nil
 }
 
+func (r *productRepository) FindProductWithExtraInfoById(id string) (*dto.ProductWithExtraInfoDTO, error) {
+    query := `
+        SELECT 
+            product."id", product."storeId", product."categoryId", product."name", product."price",
+            product."isFeatured", product."isArchived", product."sizeId", product."colorId", 
+            product."createdAt", product."updatedAt", product."count", product."isDeleted",
+            color."id", color."storeId", color."name", color."value", color."createdAt", color."updatedAt",
+            size."id", size."storeId", size."name", size."value", size."createdAt", size."updatedAt",
+            category."id", category."storeId", category."billboardId", category."name", category."createdAt", category."updatedAt",
+            image."id", image."productId", image."url", image."createdAt", image."updatedAt"
+        FROM "public"."Product" product
+        LEFT JOIN "public"."Color" color ON product."colorId" = color."id"
+        LEFT JOIN "public"."Size" size ON product."sizeId" = size."id"
+        LEFT JOIN "public"."Category" category ON product."categoryId" = category."id"
+        LEFT JOIN "public"."Image" image ON product."id" = image."productId"
+        WHERE product."id" = $1;
+    `
+
+    rows, err := r.db.Query(query, id)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        logger.Error("Error while fetching Product with extra info: ", zap.Error(err))
+        return nil, err
+    }
+    defer rows.Close()
+
+    var product *dto.ProductWithExtraInfoDTO
+
+    for rows.Next() {
+        var (
+            productId, storeId, categoryId, name string
+            price                                float64
+            isFeatured, isArchived               bool
+            sizeId, colorId                      string
+            createdAt, updatedAt                 time.Time
+            count                                int
+            isDeleted                            bool
+
+            colorIdDB, colorStoreId, colorName, colorValue string
+            colorCreatedAt, colorUpdatedAt                 time.Time
+
+            sizeIdDB, sizeStoreId, sizeName, sizeValue string
+            sizeCreatedAt, sizeUpdatedAt                 time.Time
+
+            categoryIdDB, categoryStoreId, billboardId, categoryName string
+            categoryCreatedAt, categoryUpdatedAt                       time.Time
+
+            imageId, imageProductId, imageURL sql.NullString
+            imageCreatedAt, imageUpdatedAt      sql.NullTime
+        )
+
+        err := rows.Scan(
+            &productId, &storeId, &categoryId, &name, &price,
+            &isFeatured, &isArchived, &sizeId, &colorId,
+            &createdAt, &updatedAt, &count, &isDeleted,
+            &colorIdDB, &colorStoreId, &colorName, &colorValue, &colorCreatedAt, &colorUpdatedAt,
+            &sizeIdDB, &sizeStoreId, &sizeName, &sizeValue, &sizeCreatedAt, &sizeUpdatedAt,
+            &categoryIdDB, &categoryStoreId, &billboardId, &categoryName, &categoryCreatedAt, &categoryUpdatedAt,
+            &imageId, &imageProductId, &imageURL, &imageCreatedAt, &imageUpdatedAt,
+        )
+        if err != nil {
+            logger.Error("Error while scanning product row: ", zap.Error(err))
+            return nil, err
+        }
+
+        if isDeleted {
+            return nil, nil
+        }
+
+        if product == nil {
+            product = &dto.ProductWithExtraInfoDTO{
+                Id:         productId,
+                StoreId:    storeId,
+                CategoryId: categoryId,
+                Name:       name,
+                Price:      price,
+                IsFeatured: isFeatured,
+                IsArchived: isArchived,
+                SizeId:     sizeId,
+                ColorId:    colorId,
+                CreatedAt:  createdAt,
+                UpdatedAt:  updatedAt,
+                Count:      count,
+                IsDeleted:  isDeleted,
+                Color: &entity.Color{
+                    Id:        colorIdDB,
+                    StoreId:   colorStoreId,
+                    Name:      colorName,
+                    Value:     colorValue,
+                    CreatedAt: colorCreatedAt,
+                    UpdatedAt: colorUpdatedAt,
+                },
+                Size: &entity.Size{
+                    Id:        sizeIdDB,
+                    StoreId:   sizeStoreId,
+                    Name:      sizeName,
+                    Value:     sizeValue,
+                    CreatedAt: sizeCreatedAt,
+                    UpdatedAt: sizeUpdatedAt,
+                },
+                Category: &entity.Category{
+                    Id:         categoryIdDB,
+                    StoreId:    categoryStoreId,
+                    BillboardId: billboardId,
+                    Name:       categoryName,
+                    CreatedAt:  categoryCreatedAt,
+                    UpdatedAt:  categoryUpdatedAt,
+                },
+                Images: []*entity.Image{},
+            }
+        }
+
+        if imageId.Valid {
+            img := &entity.Image{
+                Id:        imageId.String,
+                ProductId: imageProductId.String,
+                URL:       imageURL.String,
+            }
+            if imageCreatedAt.Valid {
+                img.CreatedAt = imageCreatedAt.Time
+            }
+            if imageUpdatedAt.Valid {
+                img.UpdatedAt = imageUpdatedAt.Time
+            }
+            product.Images = append(product.Images, img)
+        }
+    }
+
+    return product, nil
+}
+
 func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId string, filter dto.ProductFilterDTO) ([]*dto.ProductWithExtraInfoDTO, error) {
     productMap := make(map[string]*dto.ProductWithExtraInfoDTO)
 

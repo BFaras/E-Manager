@@ -7,12 +7,12 @@ import axiosInstance, { setUpInterceptor } from "@/app/utils/axios_instance";
 export default async function BillboardPage({
   params,
 }: {
-  params: { billboardId: string };
+  params: { billboardId: string,storeId: string };
 }) {
   const { getToken } = auth();
   await setUpInterceptor(getToken);
   
-  const response = await axiosInstance.get(`billboards/${params.billboardId}`)
+  const response = await axiosInstance.get(`stores/${params.storeId}/billboards/${params.billboardId}`)
   const billboard = response.data;
 
   return (

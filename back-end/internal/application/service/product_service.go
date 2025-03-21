@@ -31,6 +31,10 @@ func (s *ProductService) GetProduct(id string) (*entity.Product, error) {
     return product, nil
 }
 
+func (s *ProductService) GetProductWithExtraInfo(id string) (*dto.ProductWithExtraInfoDTO, error) {
+    return s.prodcutRepository.FindProductWithExtraInfoById(id)
+}
+
 func (s *ProductService) GetAllProductsWithExtraInformationByStoreId(storeId string, filter dto.ProductFilterDTO) ([]*dto.ProductWithExtraInfoDTO, error) {
     products, err := s.prodcutRepository.FindAllProductsWithExtraInformationByStoreId(storeId, filter)
     if err != nil {

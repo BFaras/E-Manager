@@ -12,10 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h* Handler) GetProductById(c echo.Context) (error) {
+func (h* Handler) GetProductWithExtraInfoById(c echo.Context) (error) {
 	logger.Debug("Fetching product by id...")
     productId := c.Param("productId")
-    product, err := h.productService.GetProduct(productId)
+    product, err := h.productService.GetProductWithExtraInfo(productId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }
