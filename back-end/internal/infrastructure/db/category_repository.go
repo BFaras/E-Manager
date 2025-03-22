@@ -32,6 +32,47 @@ func (r *CategoryRepository) FindById(id string) (*entity.Category, error) {
     return category, nil
 }
 
+func (r *CategoryRepository) FindCategoryWithExtraInfoById(id string) (*dto.CategoryWithBillboardDTO, error) {
+    query := `SELECT 
+        c."id", c."storeId", c."billboardId", c."name", c."createdAt", c."updatedAt",
+        b."id", b."storeId", b."label", b."imageUrl", b."isActive", b."createdAt", b."updatedAt"
+    FROM "public"."Category" c
+    LEFT JOIN "public"."Billboard" b
+    ON c."billboardId" = b."id"
+    WHERE c."id" = $1;`
+
+    category := &dto.CategoryWithBillboardDTO{}
+    billboard := &entity.Billboard{}
+
+    err := r.db.QueryRow(query, id).Scan(
+        &category.Id,
+        &category.StoreId,
+        &category.BillboardId,
+        &category.Name,
+        &category.CreatedAt,
+        &category.UpdatedAt,
+        &billboard.Id,
+        &billboard.StoreId,
+        &billboard.Label,
+        &billboard.ImageUrl,
+        &billboard.IsActive,
+        &billboard.CreatedAt,
+        &billboard.UpdatedAt,
+    )
+
+    if err != nil {
+        logger.Error("Error while fetching Category by ID:", zap.Error(err))
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        return nil, err
+    }
+
+    category.Billboard = billboard
+
+    return category, nil
+}
+
 func (r *CategoryRepository) FindCategoriesWithBillboard(storeId string) ([]*dto.CategoryWithBillboardDTO,error) {
 
     query := `SELECT 

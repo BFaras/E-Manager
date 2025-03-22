@@ -26,6 +26,14 @@ func (s *CategoryService) GetCategory(id string) (*entity.Category, error) {
     return categories, nil
 }
 
+func (s *CategoryService) GetCategoryWithExtraInfoById(id string) (*dto.CategoryWithBillboardDTO, error) {
+    categories, err := s.repository.FindCategoryWithExtraInfoById(id)
+    if err != nil {
+        return nil, err
+    }
+    return categories, nil
+}
+
 func (s *CategoryService) GetCategoriesWithBillboard(storeId string) ([]*dto.CategoryWithBillboardDTO, error) {
     categories, err := s.repository.FindCategoriesWithBillboard(storeId)
     if err != nil {

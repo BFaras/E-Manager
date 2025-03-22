@@ -54,7 +54,7 @@ services:
   stripe-webhook:
     image: stripe/stripe-cli
     container_name: stripe-webhook
-    command: ["listen", "--forward-to", "back-end:3000/api/webhook"]
+    command: ["listen", "--forward-to", "front-end:3000/api/webhook"]
     environment:
       STRIPE_API_KEY: "sk_test_51Pgg9SBjM7lZjJEuUxi45gjb5jw2AEvNFYbuuL3AzSAUFdPDj0YucTy5au9gaMNQjefRCxTCazPbnfXnq1dm5yR100z3lQlCgR" 
     depends_on:

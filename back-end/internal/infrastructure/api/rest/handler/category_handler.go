@@ -17,10 +17,10 @@ type CategoryRequest struct {
 }
 
 
-func (h* Handler) GetCategoryById(c echo.Context) (error) {
+func (h* Handler) GetCategoryWithExtraInfoById(c echo.Context) (error) {
 	logger.Debug("Fetching category by id...")
     categoryId := c.Param("categoryId")
-    category, err := h.categoryService.GetCategory(categoryId)
+    category, err := h.categoryService.GetCategoryWithExtraInfoById(categoryId)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
     }

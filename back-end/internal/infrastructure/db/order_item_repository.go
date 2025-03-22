@@ -67,9 +67,14 @@ func (r *orderItemRepository) FindAllOrderItemsByOrderId(orderId string) ([]*dto
     return orderItemsWithProduct, nil
 }
 
-func (r *orderItemRepository) Create(store *entity.OrderItem) error {
-    return nil
+func (r *orderItemRepository) Create(item *entity.OrderItem) error {
+	query := `
+		INSERT INTO "public"."OrderItem" ("orderId", "productId")
+		VALUES ($1, $2) RETURNING "id";
+	`
+	return r.db.QueryRow(query, item.OrderId, item.ProductId).Scan(&item.Id)
 }
+
 
 func (r *orderItemRepository) Update(store *entity.OrderItem) (*entity.OrderItem, error) {
     return nil, nil

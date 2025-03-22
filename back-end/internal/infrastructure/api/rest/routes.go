@@ -32,7 +32,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.POST("stores/:storeId/billboards", h.AddBillboard)
 	secured.PATCH("stores/:storeId/billboards/:billboardId", h.UpdateBillboard)
 
-	s.Echo.GET("stores/:storeId/categrories/:categoryId", h.GetCategoryById)
+	s.Echo.GET("stores/:storeId/categories/:categoryId", h.GetCategoryWithExtraInfoById)
 	s.Echo.GET("stores/:storeId/categories", h.GetCategoriesWithBillboard)
 	secured.DELETE("stores/:storeId/categories/:categoryId", h.DeleteCategory)
 	secured.POST("stores/:storeId/categories", h.AddCategory)
@@ -58,6 +58,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 	secured.PATCH("stores/:storeId/products/:productId", h.UpdateProduct)
 
 	s.Echo.GET("stores/:storeId/orders", h.GetAllOrdersWithExtraInformationByStoreId)
+	s.Echo.POST("stores/:storeId/orders", h.AddOrder)
 
 	/*Store*/
 

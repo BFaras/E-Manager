@@ -30,6 +30,31 @@ func (s *OrderService) GetOrder(id string) (*entity.Order, error) {
     return order, nil
 }
 
+func (s *OrderService) CreateOrder(storeId string, productIds []string) (*entity.Order, error) {
+	order := &entity.Order{
+		StoreId: storeId,
+		IsPaid:  false,
+	}
+
+	err := s.orderRepository.Create(order)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, productId := range productIds {
+		orderItem := &entity.OrderItem{
+			OrderId:   order.Id,
+			ProductId: productId,
+		}
+		err := s.orderItemRepository.Create(orderItem)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return order, nil
+}
+
 func (s *OrderService) GetAllOrdersWithExtraInformationByStoreId(storeId string) ([]*dto.OrderWithExtraInfoDTO, error) {
 
     orders, err := s.orderRepository.FindAllOrdersWithExtraInfoByStoreId(storeId)

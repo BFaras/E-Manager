@@ -7,6 +7,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type RequestBody struct {
+	ProductsId []string `json:"productsId"`
+}
+
 func (h* Handler) GetOrderById(c echo.Context) (error) {
 	logger.Debug("Fetching order by id...")
     orderId := c.Param("orderId")
@@ -26,4 +30,25 @@ func (h *Handler) GetAllOrdersWithExtraInformationByStoreId(c echo.Context) erro
         return c.JSON(http.StatusInternalServerError, zap.Error(err))
     }
     return c.JSON(http.StatusOK, sizes)
+}
+
+func (h *Handler) AddOrder(c echo.Context) error {
+	storeId := c.Param("storeId")
+	var body RequestBody
+
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid request body"})
+	}
+
+	if len(body.ProductsId) == 0 {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "No product IDs provided"})
+	}
+
+	order, err := h.orderService.CreateOrder(storeId, body.ProductsId)
+	if err != nil {
+		logger.Error("Failed to create order", zap.Error(err))
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to create order"})
+	}
+
+	return c.JSON(http.StatusOK, order)
 }

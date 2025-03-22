@@ -7,6 +7,7 @@ import (
 
 type CategoryRepository interface {
     FindById(id string) (*entity.Category, error)
+    FindCategoryWithExtraInfoById(id string) (*dto.CategoryWithBillboardDTO, error) 
     Create(store *entity.Category) error
     Update(store *entity.Category) (error)
     Delete(id string) error

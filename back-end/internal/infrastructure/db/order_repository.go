@@ -64,8 +64,13 @@ func (r *orderRepository) FindAllOrdersWithExtraInfoByStoreId(storeId string) ([
     return ordersWithExtraInfo, nil
 }
 
-func (r *orderRepository) Create(store *entity.Order) error {
-    return nil
+func (r *orderRepository) Create(order *entity.Order) error {
+	query := `
+		INSERT INTO "public"."Order" ("storeId", "isPaid", "phone", "address")
+		VALUES ($1, $2, '', '') RETURNING "id", "createdAt", "updatedAt";
+	`
+	return r.db.QueryRow(query, order.StoreId, order.IsPaid).
+		Scan(&order.Id, &order.CreatedAt, &order.UpdatedAt)
 }
 
 func (r *orderRepository) Update(store *entity.Order) (error) {
