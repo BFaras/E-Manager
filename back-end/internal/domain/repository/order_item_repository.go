@@ -11,4 +11,6 @@ type OrderItemRepository interface {
     Update(store *entity.OrderItem) (*entity.OrderItem, error)
     Delete(id string) error
     FindAllOrderItemsByOrderId(storeId string) ([]*dto.OrderItemWithProductDTO ,error) 
+    FindOrderItemByProductId(id string) (*entity.OrderItem, error)
+    FindOrderItemsByOrderId(orderId string) ([]*entity.OrderItem, error)
 }

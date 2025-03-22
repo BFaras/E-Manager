@@ -61,7 +61,7 @@ func (h *Handler) AddOrder(c echo.Context) error {
 }
 
 func (h *Handler) UpdateOrder(c echo.Context) error {
-    logger.Debug("Updating billboard...")
+    logger.Debug("Updating order after purchase...")
 
     orderId := c.Param("orderId")
 
@@ -84,6 +84,30 @@ func (h *Handler) UpdateOrder(c echo.Context) error {
 
     if err := h.orderService.UpdateOrder(order); err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+
+    orderItems, err := h.orderItemService.GetOrderItemsByOrderId(order.Id)
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+    for _, orderItem := range orderItems {
+
+        product, err := h.productService.GetProduct(orderItem.ProductId)
+        if err != nil {
+            logger.Error("Failed to fetch product", zap.String("productId", orderItem.ProductId), zap.Error(err))
+            continue 
+        }
+
+
+        product.Count -= 1 
+        if product.Count < 1 {
+            product.IsArchived = true
+        }
+
+        if err := h.productService.UpdateProduct(product); err != nil {
+            logger.Error("Failed to update product", zap.String("productId", product.Id), zap.Error(err))
+            continue
+        }
     }
 
     return c.NoContent(http.StatusOK)

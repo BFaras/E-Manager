@@ -30,12 +30,14 @@ func (h *Handler) GetAllProductsWithExtraInformationByStoreId(c echo.Context) er
     sizeId := c.QueryParam("sizeId")
     categoryId := c.QueryParam("categoryId")
     isFeatured := c.QueryParam("isFeatured")
+    isArchived := c.QueryParam("isArchived")
 
     filter := dto.ProductFilterDTO{
         ColorId:    colorId,
         SizeId:     sizeId,
         CategoryId: categoryId,
         IsFeatured: isFeatured,
+        IsArchived: isArchived,
     }
 
     products, err := h.productService.GetAllProductsWithExtraInformationByStoreId(storeId, filter)
@@ -92,6 +94,10 @@ func (h *Handler) AddProduct(c echo.Context) error {
         Images:    req.Images,
     }
 
+    if product.Count < 1 {
+        product.IsArchived = true
+    }
+
     err := h.productService.CreateProduct(product)
     if err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())
@@ -133,7 +139,12 @@ func (h *Handler) UpdateProduct(c echo.Context) error {
     product.ColorId = req.ColorId
     product.IsFeatured = req.IsFeatured
     product.IsArchived = req.IsArchived
+    product.Count = req.Count
     product.UpdatedAt = time.Now()
+
+    if product.Count < 1 {
+        product.IsArchived = true
+    }
 
     if err := h.productService.UpdateProduct(product); err != nil {
         return c.JSON(http.StatusInternalServerError, err.Error())

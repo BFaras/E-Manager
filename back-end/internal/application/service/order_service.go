@@ -61,7 +61,7 @@ func (s *OrderService) GetAllOrdersWithExtraInformationByStoreId(storeId string)
     if err != nil {
         return nil, err
     }
-
+    
     if orders == nil{
         return nil, nil
     }

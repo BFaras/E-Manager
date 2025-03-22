@@ -5,4 +5,6 @@ type ProductFilterDTO struct {
     SizeId     string `json:"sizeId"`
     CategoryId string `json:"categoryId"`
     IsFeatured string `json:"isFeatured"`
+    IsArchived string `json:"isArchived"`
+    
 }

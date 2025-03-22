@@ -216,6 +216,12 @@ func (r *productRepository) FindAllProductsWithExtraInformationByStoreId(storeId
         args = append(args, isFeaturedBool)
         argIndex++
     }
+    if filter.IsArchived == "true" || filter.IsArchived == "false" {
+        baseQuery += fmt.Sprintf(` AND product."isArchived" = $%d`, argIndex)
+        isArchivedBool := (filter.IsArchived == "true")
+        args = append(args, isArchivedBool)
+        argIndex++
+    }
 
     baseQuery += ` ORDER BY product."createdAt" DESC`
 

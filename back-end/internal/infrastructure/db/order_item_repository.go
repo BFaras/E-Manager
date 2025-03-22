@@ -75,6 +75,47 @@ func (r *orderItemRepository) Create(item *entity.OrderItem) error {
 	return r.db.QueryRow(query, item.OrderId, item.ProductId).Scan(&item.Id)
 }
 
+func (r *orderItemRepository) FindOrderItemsByOrderId(orderId string) ([]*entity.OrderItem, error) {
+    var orderItems []*entity.OrderItem
+
+    query := `SELECT "id", "orderId", "productId" FROM "public"."OrderItem" WHERE "orderId" = $1;`
+    rows, err := r.db.Query(query, orderId)
+    if err != nil {
+        logger.Error("Error while fetching OrderItems by OrderId: ", zap.Error(err))
+        return nil, err
+    }
+    defer rows.Close()
+
+    for rows.Next() {
+        item := &entity.OrderItem{}
+        if err := rows.Scan(&item.Id, &item.OrderId, &item.ProductId); err != nil {
+            logger.Error("Error scanning OrderItem row: ", zap.Error(err))
+            return nil, err
+        }
+        orderItems = append(orderItems, item)
+    }
+
+    if err := rows.Err(); err != nil {
+        logger.Error("Error iterating OrderItem rows: ", zap.Error(err))
+        return nil, err
+    }
+
+    return orderItems, nil
+}
+func (r *orderItemRepository) FindOrderItemByProductId(id string) (*entity.OrderItem, error) {
+    orderItem := &entity.OrderItem{}
+    query := `SELECT "id", "orderId", "productId" FROM "public"."OrderItem" WHERE "productId" = $1 LIMIT 1;`
+    err := r.db.QueryRow(query, id).Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        logger.Error("Error while fetching OrderItem by ProductId: ", zap.Error(err))
+        return nil, err
+    }
+    return orderItem, nil
+}
+
 
 func (r *orderItemRepository) Update(store *entity.OrderItem) (*entity.OrderItem, error) {
     return nil, nil
