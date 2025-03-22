@@ -34,13 +34,11 @@ export async function POST(
   }
 
   try {
-    // ✅ 1. Fetch each product from Go backend
     const productPromises = productsId.map((id: string) =>
       axiosInstance.get(`/stores/${storeId}/products/${id}`).then((res) => res.data)
     );
     const products = await Promise.all(productPromises);
 
-    // ✅ 2. Prepare Stripe line items
     const listItems: Stripe.Checkout.SessionCreateParams.LineItem[] = products.map((product: any) => ({
       quantity: 1,
       price_data: {
@@ -50,12 +48,10 @@ export async function POST(
       },
     }));
 
-    // ✅ 3. Create order in Go backend
     const { data: order } = await axiosInstance.post(`/stores/${storeId}/orders`, {
       productsId,
     });
 
-    // ✅ 4. Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       line_items: listItems,
       mode: "payment",

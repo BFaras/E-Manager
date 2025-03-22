@@ -88,3 +88,12 @@ func (s *OrderService) GetAllOrdersWithExtraInformationByStoreId(storeId string)
     return orders, nil
 
 }
+
+func (s *OrderService) UpdateOrder(order *entity.Order) (error) {
+    err := s.orderRepository.Update(order)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+

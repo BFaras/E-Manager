@@ -7,13 +7,13 @@ export async function middleware(req: NextRequest) {
     const { userId, getToken } = auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    await setUpInterceptor(getToken); // Ensure token interceptor is set
+    await setUpInterceptor(getToken); 
 
     const path = req.nextUrl.searchParams.get("path");
     if (!path) return NextResponse.json({ error: "Missing path" }, { status: 400 });
 
     const method = req.method;
-    const body = method !== "GET" && method !== "DELETE" ? await req.json() : undefined; // Don't parse body for DELETE
+    const body = method !== "GET" && method !== "DELETE" ? await req.json() : undefined; 
 
     const response = await axiosInstance({
       method,
@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json(response.data);
     }
 
-    return new NextResponse(null, { status: response.status }); // Send empty response with correct status
+    return new NextResponse(null, { status: response.status }); 
   } catch (error: any) {
     console.error("Proxy API Error:", error.message || error);
 
@@ -37,7 +37,6 @@ export async function middleware(req: NextRequest) {
   }
 }
 
-// Export handlers for all methods
 export const GET = middleware;
 export const POST = middleware;
 export const PUT = middleware;

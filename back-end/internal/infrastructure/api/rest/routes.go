@@ -59,6 +59,7 @@ func (s *Server) routes(h *handler.Handler, m *middleware.Middleware) {
 
 	s.Echo.GET("stores/:storeId/orders", h.GetAllOrdersWithExtraInformationByStoreId)
 	s.Echo.POST("stores/:storeId/orders", h.AddOrder)
+	s.Echo.POST("stores/:storeId/orders/:orderId", h.UpdateOrder)
 
 	/*Store*/
 

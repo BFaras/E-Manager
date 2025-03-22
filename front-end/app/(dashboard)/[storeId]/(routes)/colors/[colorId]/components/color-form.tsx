@@ -80,7 +80,6 @@ export default function ColorForm({ initialData }: ColorFormProps) {
     }
   };
 
-  // ✅ Delete request using `/api/proxy`
   const onDelete = async () => {
     try {
       setLoading(true);

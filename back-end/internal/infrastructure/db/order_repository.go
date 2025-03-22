@@ -73,8 +73,14 @@ func (r *orderRepository) Create(order *entity.Order) error {
 		Scan(&order.Id, &order.CreatedAt, &order.UpdatedAt)
 }
 
-func (r *orderRepository) Update(store *entity.Order) (error) {
-    return nil
+func (r *orderRepository) Update(order *entity.Order) error {
+	query := `
+		UPDATE "public"."Order"
+		SET "isPaid" = $1, "address" = $2, "phone" = $3, "updatedAt" = NOW()
+		WHERE "id" = $4;
+	`
+	_, err := r.db.Exec(query, order.IsPaid, order.Address, order.Phone, order.Id)
+	return err
 }
 
 func (r *orderRepository) Delete(id string) error {

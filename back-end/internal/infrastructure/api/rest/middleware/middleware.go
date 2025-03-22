@@ -42,7 +42,7 @@ func (m *Middleware) CORSConfig() echo.MiddlewareFunc {
 }
 
 func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	jwksURL := "https://fast-barnacle-55.clerk.accounts.dev/.well-known/jwks.json" // replace with your Clerk JWKS URL
+	jwksURL := "https://fast-barnacle-55.clerk.accounts.dev/.well-known/jwks.json" 
 
 	options := keyfunc.Options{
 		RefreshInterval: time.Hour,
@@ -58,7 +58,6 @@ func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 
 	return func(c echo.Context) error {
-		// Extract the token from the Authorization header.
 		tokenString := c.Request().Header.Get("Authorization")
 		zap.L().Debug("Received Authorization Header", zap.String("Authorization", tokenString))
 		if tokenString == "" {

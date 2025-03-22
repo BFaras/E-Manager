@@ -1,4 +1,4 @@
-// Store.ts
+
 export interface Store {
     id: string;
     name: string;
@@ -7,17 +7,15 @@ export interface Store {
     updatedAt: Date;
 }
 
-// Size.ts
 export interface Size {
     id: string;
     storeId: string;
     name: string;
     value: string;
-    createdAt: Date; // Consider changing to Date if appropriate
-    updatedAt: Date; // Consider changing to Date if appropriate
+    createdAt: Date; 
+    updatedAt: Date; 
 }
 
-// Product.ts
 export interface Product {
     id: string;
     storeId: string;
@@ -32,7 +30,6 @@ export interface Product {
     updatedAt: Date;
 }
 
-// Order.ts
 export interface Order {
     id: string;
     storeId: string;
@@ -43,14 +40,12 @@ export interface Order {
     updatedAt: Date;
 }
 
-// OrderItem.ts
 export interface OrderItem {
     id: string;
     orderId: string;
     productId: string;
 }
 
-// Image.ts
 export interface Image {
     id: string;
     productId: string;
@@ -59,7 +54,6 @@ export interface Image {
     updatedAt: Date;
 }
 
-// Color.ts
 export interface Color {
     id: string;
     storeId: string;
@@ -69,7 +63,6 @@ export interface Color {
     updatedAt: Date;
 }
 
-// Category.ts
 export interface Category {
     id: string;
     storeId: string;
@@ -80,7 +73,6 @@ export interface Category {
     updatedAt: Date;
 }
 
-// Billboard.ts
 export interface Billboard {
     id: string;
     storeId: string;

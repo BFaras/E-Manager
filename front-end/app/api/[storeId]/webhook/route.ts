@@ -3,8 +3,12 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
+import axiosInstance from "@/app/utils/axios_instance";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request,
+  { params }: { params: { storeId: string } }
+) {
   const body = await req.text();
   const signature = headers().get("Stripe-Signature") as string;
   
@@ -35,32 +39,13 @@ export async function POST(req: Request) {
   const addressString = addressComponents.filter((c) => c !== null).join(", ");
 
   if (event.type === "checkout.session.completed") {
-    const order = await prismaDB.order.update({
-      where: {
-        id: session?.metadata?.orderId,
-      },
-      data: {
-        isPaid: true,
-        address: addressString,
-        phone: session?.customer_details?.phone || " ",
-      },
-      include: {
-        orderItems: true,
-      },
-    });
 
-    const productsId = order.orderItems.map((orderItem) => orderItem.productId);
-
-    await prismaDB.product.updateMany({
-      where: {
-        id: {
-          in: [...productsId],
-        },
-      },
-      data: {
-        isArchived: true,
-      },
+    const order = await axiosInstance.post(`/stores/${params.storeId}/orders/${session?.metadata?.orderId}`, {
+      isPaid: true,
+      address: addressString || " ",
+      phone: session?.customer_details?.phone || " ",
     });
+    console.log("order :", order)
   }
 
   return new NextResponse(null, { status: 200 });

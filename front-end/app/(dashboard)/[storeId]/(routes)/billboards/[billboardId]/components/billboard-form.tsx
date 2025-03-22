@@ -56,7 +56,6 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     },
   });
 
-  // ✅ Use `/api/proxy` instead of axiosInstance
   const onSubmit = async (data: BillboardFormValues) => {
     try {
       setLoading(true);
@@ -84,7 +83,6 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
     }
   };
 
-  // ✅ Delete request using `/api/proxy`
   const onDelete = async () => {
     try {
       setLoading(true);

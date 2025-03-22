@@ -5,10 +5,17 @@ import (
 	"net/http"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
+	"database/sql"
 )
 
 type RequestBody struct {
 	ProductsId []string `json:"productsId"`
+}
+
+type UpdateOrderRequest struct {
+	IsPaid  bool   `json:"isPaid"`
+	Phone   string `json:"phone"`
+	Address string `json:"address"`
 }
 
 func (h* Handler) GetOrderById(c echo.Context) (error) {
@@ -51,4 +58,33 @@ func (h *Handler) AddOrder(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, order)
+}
+
+func (h *Handler) UpdateOrder(c echo.Context) error {
+    logger.Debug("Updating billboard...")
+
+    orderId := c.Param("orderId")
+
+    var req UpdateOrderRequest
+    if err := c.Bind(&req); err != nil {
+        return c.JSON(http.StatusBadRequest, err.Error())
+    }
+
+    order, err := h.orderService.GetOrder(orderId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return c.JSON(http.StatusNotFound, err.Error())
+        }
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+
+    order.IsPaid = req.IsPaid
+    order.Address = req.Address
+    order.Phone = req.Phone
+
+    if err := h.orderService.UpdateOrder(order); err != nil {
+        return c.JSON(http.StatusInternalServerError, err.Error())
+    }
+
+    return c.NoContent(http.StatusOK)
 }
