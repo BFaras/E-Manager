@@ -57,8 +57,6 @@ services:
     command: ["listen", "--forward-to", "front-end:3000/api/42a53b71-7fc8-4644-a6e3-3fe2c0c03443/webhook"]
     env_file:
     - ./front-end/.env
-    environment:
-      STRIPE_API_KEY: ${STRIPE_API_KEY}
     depends_on:
       - front-end
     networks:
