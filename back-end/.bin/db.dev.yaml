@@ -1,6 +1,6 @@
 db:
   user: "postgres"
-  password: 'Holoras15'
+  password: 'Testing12345'
   host: "db"
   port: "5432"
   name: "postgres"

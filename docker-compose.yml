@@ -10,7 +10,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: 'postgres://postgres:Holoras15@db:5432/postgres?sslmode=disable'
+      DATABASE_URL: 'postgres://postgres:Testing12345@db:5432/postgres?sslmode=disable'
       STRIPE_WEBHOOK_URL: "http://stripe-webhook:3000/api/webhook"
     ports:
       - 8080:8080
@@ -24,7 +24,7 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 'Holoras15'
+      POSTGRES_PASSWORD: 'Testing12345'
       POSTGRES_DB: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -54,11 +54,13 @@ services:
   stripe-webhook:
     image: stripe/stripe-cli
     container_name: stripe-webhook
-    command: ["listen", "--forward-to", "front-end:3000/api/7fc35eaa-76c9-4eee-b540-ca88652e10dc/webhook"]
+    command: ["listen", "--forward-to", "front-end:3000/api/42a53b71-7fc8-4644-a6e3-3fe2c0c03443/webhook"]
+    env_file:
+    - ./front-end/.env
     environment:
-      STRIPE_API_KEY: "sk_test_51Pgg9SBjM7lZjJEuUxi45gjb5jw2AEvNFYbuuL3AzSAUFdPDj0YucTy5au9gaMNQjefRCxTCazPbnfXnq1dm5yR100z3lQlCgR" 
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
     depends_on:
-      - back-end
+      - front-end
     networks:
       - app_network
     ports:
@@ -67,6 +69,7 @@ services:
 networks:
   app_network:
     driver: bridge
+    external: true
 
 volumes:
   postgres_data:

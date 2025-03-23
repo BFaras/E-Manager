@@ -10,6 +10,8 @@ import (
 	"time"
 	"github.com/MicahParks/keyfunc"
 	"go.uber.org/zap"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 type Middleware struct {
@@ -41,8 +43,22 @@ func (m *Middleware) CORSConfig() echo.MiddlewareFunc {
 	})
 }
 
+func loadEnvValue(prefix string) (string, error) {
+    err := godotenv.Load("/app/.bin/.env")
+    if err != nil {
+        return "", err
+    }
+    return os.Getenv(prefix), nil
+}
+
 func (m *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	jwksURL := "https://fast-barnacle-55.clerk.accounts.dev/.well-known/jwks.json" 
+	
+	clerkKey, err := loadEnvValue("CLERK_PUBLIC_KEY_JWKS")
+    if err != nil {
+        return nil
+    }
+
+	jwksURL := clerkKey 
 
 	options := keyfunc.Options{
 		RefreshInterval: time.Hour,

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+NETWORK_NAME="app_network"
+
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_ZmFzdC1iYXJuYWNsZS01NS5jbGVyay5hY2NvdW50cy5kZXYk"
+CLERK_SECRET_KEY="sk_test_1kGlPsGM4rjwAJUTWhq8PQo5TMQVJf4U100rKaMbAM"
+
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="dbw4jrkf3"
+NEXT_PUBLIC_COUDINARY_PRESET="uedardcp"
+
+STRIPE_API_KEY="sk_test_51Pgg9SBjM7lZjJEuUxi45gjb5jw2AEvNFYbuuL3AzSAUFdPDj0YucTy5au9gaMNQjefRCxTCazPbnfXnq1dm5yR100z3lQlCgR"
+STRIPE_WEBHOOK_SECRET="whsec_c6f29c39101703d7505e159dfeaf39776ea2a5d14411c401d46ab9fc552fa699"
+
+CLERK_PUBLIC_KEY_JWKS="https://fast-barnacle-55.clerk.accounts.dev/.well-known/jwks.json"
+ENV_FILE="./front-end/.env"
+
+if [ -f "$ENV_FILE" ]; then
+  echo "⚠️  .env file already exists — it will be overwritten..."
+else
+  echo "🆕 .env file does not exist — creating a new one..."
+fi
+
+cat > "$ENV_FILE" <<EOF
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+
+NEXT_PUBLIC_GO_URL=http://back-end:8080
+FRONTEND_STORE_URL=http://localhost:3002
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY=$CLERK_SECRET_KEY
+
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+NEXT_PUBLIC_COUDINARY_PRESET=$NEXT_PUBLIC_COUDINARY_PRESET
+
+DATABASE_URL=postgresql://postgres:Testing12345@db:5432/postgres?schema=public
+
+STRIPE_API_KEY=$STRIPE_API_KEY
+STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET
+EOF
+
+
+BACKEND_ENV_FILE="./back-end/.bin/.env"
+
+if [ -f "$BACKEND_ENV_FILE" ]; then
+  echo "⚠️  Backend .env file already exists — it will be overwritten..."
+else
+  echo "🆕 Backend .env file does not exist — creating a new one..."
+fi
+
+cat > "$BACKEND_ENV_FILE" <<EOF
+DB_URL="postgresql://postgres:Testing12345@db:5432/postgres?sslmode=disable"
+CLERK_PUBLIC_KEY_JWKS=$CLERK_PUBLIC_KEY_JWKS
+EOF
+
+echo "Backend .env file written at $BACKEND_ENV_FILE"
+
+echo " Starting Docker Compose in E-Manager..."
+docker-compose up -d

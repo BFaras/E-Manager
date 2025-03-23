@@ -3,27 +3,22 @@
 
 ## Project Overview
 
-This project allows users to create multiple stores, add products, and manage store-related operations. Each store can have multiple products, but before adding a product, a billboard, category, and size must be created. Once a product is added, it becomes available for purchase in the store, and the dashboard is updated to provide analytics for the user, including total revenue and sales metrics.
+E-Manager allows users to create and manage multiple stores, add products, and handle store-related operations.
+Each store can contain multiple products. However, before adding a product, you must first create a billboard, category, and size.
 
-## Environment variables
+Once a product is added, it becomes available for purchase in the corresponding store. The dashboard will then display real-time analytics, including total revenue and sales metrics.
 
-First step should be to get the environment variables for testing this application. You can do it by creating an account in each of one of the next webiste getting your own api key:
+This guide walks you through how to launch this project on a Windows machine. Most of the steps are automated using Docker and .sh files.
+
+## Get Environment Variables
+
+Before running the application, you need to create accounts and obtain API keys from the following services:
 
 * [Cloudinary](https://cloudinary.com/)
 * [Stripe](https://stripe.com)
 * [Clerk](https://clerk.com/)
 
-Then we need to choose a password that we will set in the .env file within the front-end, db and backend directorty.
-
-/back-end/.bin/.env
-
-```shell
-
-DB_URL="postgresql://postgres:<password25>@localhost:5432/postgres?sslmode=disable"
-
-```
-
-/front-end/.env
+Then, populate the environment variables in your .env or directly in the start-project.sh file:
 
 ```shell
 
@@ -33,39 +28,37 @@ CLERK_SECRET_KEY=<api_key>
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<name>
 NEXT_PUBLIC_COUDINARY_PRESET=<preset>
 
-DATABASE_URL="postgresql://postgres:<password>@localhost:5432/postgres?schema=public"
-
 STRIPE_API_KEY=<api_key>
 STRIPE_WEBHOOK_SECRET=<web_hook>
+CLERK_API_KEY_JWKS=<api_key>
 
 ```
 
-/db/Dockerfile
+## Run application
+
+Make sure Docker is installed on your local machine. Once installed:
+  
+* Start Docker Desktop.
+
+* Open a terminal such as Git Bash (recommended on Windows).
+
+* Run the following command to start the project:
 
 ```shell
 
-ENV POSTGRES_PASSWORD=<password>
+./start-project.sh
 
 ```
 
-Once this has been done, we can finally start testing the application. We use a Docker compose and do the following command :
-
-```shell
-
-docker-compose up --build -d
-
-```
-Once this has been done, use your browser and enter the url leading you to the front-end of the applicaiton. Then, connect yourself using your own google account and you can finally start testing the CMS application called E-Manager.
-
-The next step should be to set up the e-commerce side using the next link to my next project:
+To connect the backend with the storefront, clone and run the companion project:
 
 * [E-Commerce](https://github.com/BFaras/E-Commerce)
 
+Follow the setup instructions in that repository to complete the full e-commerce experience.
+
 ## Showcase of the whole project
 
-In case you want to see what the final result looks like, you can watch the following video that showcases what it looks like:
-
-
+Want to see what the final result looks like? Watch this video showcasing all the features of the E-Manager and E-Commerce apps:
 
 
 

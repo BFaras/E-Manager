@@ -15,7 +15,6 @@ let requestInterceptor: number | null = null;
 let responseInterceptor: number | null = null;
 
 export async function setUpInterceptor(getToken: any) {
-  console.log(" Setting up Axios interceptors...");
 
   if (requestInterceptor !== null) {
     axiosInstance.interceptors.request.eject(requestInterceptor);
@@ -27,17 +26,14 @@ export async function setUpInterceptor(getToken: any) {
 
   requestInterceptor = axiosInstance.interceptors.request.use(
     async (config) => {
-      console.log(" Intercepting request to:", config.url);
       try {
         const token = await getToken({ refresh: true });
         if (token) {
-          console.log(" Token found, attaching to request.");
           config.headers["Authorization"] = `Bearer ${token}`;
 
 
           try {
             const decoded: any = jwtDecode(token);
-            console.log(" Token expires in:", decoded.exp - Math.floor(Date.now() / 1000), "seconds");
           } catch (decodeError) {
             console.warn(" Could not decode token:", decodeError);
           }
@@ -58,7 +54,6 @@ export async function setUpInterceptor(getToken: any) {
 
   responseInterceptor = axiosInstance.interceptors.response.use(
     (response) => {
-      console.log(" Response received:", response.status, response.data);
       return response;
     },
     async (error) => {
@@ -69,7 +64,6 @@ export async function setUpInterceptor(getToken: any) {
         try {
           const newToken = await getToken({ refresh: true });
           if (newToken) {
-            console.log(" New token acquired. Retrying request...");
             originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
             return axiosInstance(originalRequest);
           } else {

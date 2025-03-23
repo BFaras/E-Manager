@@ -45,7 +45,6 @@ export async function POST(
       address: addressString || " ",
       phone: session?.customer_details?.phone || " ",
     });
-    console.log("order :", order)
   }
 
   return new NextResponse(null, { status: 200 });

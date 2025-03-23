@@ -12,8 +12,8 @@ export default async function CategoryPage({
   const {getToken} = auth()
 
   await setUpInterceptor(getToken)
-
-  const responseCategory = await axiosInstance.get(`stores/${params.storeId}/categrories/${params.categoryId}`)
+  
+  const responseCategory = await axiosInstance.get(`stores/${params.storeId}/categories/${params.categoryId}`)
   const category = responseCategory.data
   const reponseBillboards = await axiosInstance.get(`stores/${params.storeId}/billboards`)
   const billboards = reponseBillboards.data
