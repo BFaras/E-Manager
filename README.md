@@ -60,7 +60,7 @@ Follow the setup instructions in that repository to complete the full e-commerce
 
 Want to see what the final result looks like? Watch this video showcasing all the features of the E-Manager and E-Commerce apps:
 
-
+* [Video](https://youtu.be/Y5JePco9eVY)
 
 
 
